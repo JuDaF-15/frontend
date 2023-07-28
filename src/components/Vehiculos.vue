@@ -1,8 +1,7 @@
 <template>
   <div>
-    <div>
+    <!-- <div>
       <input type="text" v-model="matricula" placeholder="matricula" style="width: fit-content;">
-      <!-- Cambiar a un menú desplegable para seleccionar el conductor -->
       <select style="width: fit-content;" v-model="c">
         <option value="">Seleccione el conductor...</option>
         <option v-for="(conductor, i) in conduc" :key="i" :value="conductor._id">
@@ -13,14 +12,39 @@
       <input type="text" v-model="marca" placeholder="marca" style="margin-top: 10px;width: fit-content;">
       <input type="text" v-model="modelo" placeholder="modelo" style="margin-top: 10px;width: fit-content;">
       <input type="number" v-model="capacidad" placeholder="capacidad" style="margin-top: 10px;width: fit-content;">
-    </div><br>
-
-    <p>{{ c }}</p>
-    <p>jaja</p>
+    </div><br> -->
 
     <div>
-      <button @click="registrar">Guardar Vehículo</button>
-    </div><br>
+      <q-btn label="Registrar Vehículo" color="primary" @click="alert = true" />
+    </div><br><br>
+
+    <q-dialog v-model="alert">
+      <q-card style="width: 32%;">
+        <q-card-section>
+          <div class="text-h6">Registrar Vehículo</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none" style="overflow-x:hidden;">
+          <div>
+            <q-input outlined label="Matrícula" v-model="matricula" />
+            <q-select label="Conductor" outlined style="width: auto;margin-top: 10px;" v-model="c"
+              :options="conduc.map(conductor => ({ label: conductor.nombre, value: conductor._id }))" emit-value
+              map-options>
+            </q-select>
+            <q-input style="margin-top: 10px;" outlined label="Tipo" v-model="tipo" />
+            <q-input style="margin-top: 10px;" outlined label="Marca" v-model="marca" />
+            <q-input style="margin-top: 10px;" outlined label="Modelo" v-model="modelo" />
+            <q-input style="margin-top: 10px;" outlined label="Capacidad" v-model="capacidad" type="number" />
+          </div><br>
+
+          <q-card-actions align="right">
+            <q-btn style="margin-top: -10px;" label="Guardar" color="primary" @click="registrar" />
+          </q-card-actions>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <p>{{ c }}</p>
 
     <div>
       <table>
@@ -69,9 +93,12 @@ let tipo = ref("")
 let marca = ref("")
 let modelo = ref("")
 let capacidad = ref("")
+
 let conduc = ref([])
 let data = ref([])
 let c = ref("")
+
+let alert = ref(false)
 
 onMounted(() => {
   traerConductores()

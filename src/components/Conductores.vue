@@ -23,9 +23,7 @@
           </div><br>
 
           <q-card-actions align="right">
-            <button style="margin-top: -10px;" @click="registrar()">
-              Guardar
-            </button>
+            <q-btn style="margin-top: -10px;" label="Guardar" color="primary" @click="registrar" />
           </q-card-actions>
         </q-card-section>
       </q-card>

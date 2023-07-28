@@ -55,8 +55,8 @@
               </q-item-section>
 
               <q-item-section>
-                <router-link to="/busetas" style="text-decoration: none;color: black;">
-                  Busetas
+                <router-link to="/vehiculos" style="text-decoration: none;color: black;">
+                  Vehículos
                 </router-link>
               </q-item-section>
             </q-item>

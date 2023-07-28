@@ -3,7 +3,7 @@ import Header from "../components/Header.vue"
 import HeaderVen from "../components/HeaderVen.vue"
 import HomeAdmin from "../components/HomeAdmin.vue"
 import Conductores from "../components/Conductores.vue"
-import Busetas from "../components/Busetas.vue"
+import Vehiculos from "../components/Vehiculos.vue"
 import Rutas from "../components/Rutas.vue"
 import Vendedores from "../components/Vendedores.vue"
 import Clientes from "../components/Clientes.vue"
@@ -16,7 +16,7 @@ export const routes = [
         path: "/menuAdmin", component: Header, children: [
             { path: "/homeAdmin", component: HomeAdmin },
             { path: "/conductores", component: Conductores },
-            { path: "/busetas", component: Busetas },
+            { path: "/vehiculos", component: Vehiculos },
             { path: "/rutas", component: Rutas },
             { path: "/vendedores", component: Vendedores },
         ]

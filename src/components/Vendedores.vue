@@ -16,14 +16,11 @@
                         <q-input style="margin-top: 10px;" outlined label="Nombre" v-model="nombre" />
                         <q-input style="margin-top: 10px;" outlined label="Teléfono" v-model="telefono" />
                         <q-input style="margin-top: 10px;" outlined label="Username" v-model="username" />
-                        <q-input style="margin-top: 10px;" label="Contraseña" v-model="clave" filled type="password" />
+                        <q-input style="margin-top: 10px;" outlined label="Contraseña" v-model="clave"  type="password" />
 
                     </div><br>
-
                     <q-card-actions align="right">
-                        <button style="margin-top: -10px;" @click="registrar()">
-                            Guardar
-                        </button>
+                        <q-btn style="margin-top: -10px;" label="Guardar" color="primary" @click="registrar" />
                     </q-card-actions>
                 </q-card-section>
             </q-card>
