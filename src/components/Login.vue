@@ -1,12 +1,7 @@
 <template>
   <div>
-    <div>
-      <q-btn label="LOGIN DE ADMINISTRADOR" color="primary" @click="mostrarAdmin = true" v-if="!mostrarAdmin"/>
-      <q-btn label="LOGIN DE VENDEDOR" color="primary" @click="mostrarAdmin = false" v-else />
-    </div>
-
-    <div class="container" v-if="mostrarAdmin">
-      <h2>Login de Administrador</h2>
+    <div class="container">
+      <h2>Login</h2>
       <form id="admin-login-form">
         <p>
           <i class="input-icon fas fa-user"></i> Usuario
@@ -24,32 +19,12 @@
       </form>
     </div>
 
-    <div class="container" v-else>
-      <h2>Login de Vendedor</h2>
-      <form id="user-login-form">
-        <p>
-          <i class="input-icon fas fa-user"></i> Usuario
-          <input type="text" class="input-with-icon" required />
-        </p>
-        <p>
-          <i class="input-icon fas fa-lock"></i> Contraseña
-          <input type="password" class="input-with-icon" required />
-        </p>
-        <p>
-          <router-link to="/menuVendedor">
-            <button class="log" type="submit">Ingresar</button>
-          </router-link>
-        </p>
-      </form>
-    </div>
   </div>
 </template>
 
 
 <script setup>
-import { ref } from "vue";
 
-let mostrarAdmin = ref(true)
 
 </script>
 

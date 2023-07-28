@@ -35,7 +35,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Documento</th>
+                        <th>cedula</th>
                         <th>Nombre</th>
                         <th>Teléfono</th>
                         <th>Username</th>
@@ -66,7 +66,7 @@ import { useVendedorStore } from "../stores/vendedores.js"
 import { ref } from "vue"
 
 const useVendedor = useVendedorStore()
-let documento = ref("")
+let cedula = ref("")
 let nombre = ref("")
 let telefono = ref("")
 let username = ref("")
@@ -85,7 +85,7 @@ async function traer() {
 
 async function registrar() {
     let res = await useVendedor.registrarVendedor({
-        cedula: documento.value,
+        cedula: cedula.value,
         nombre: nombre.value,
         telefono: telefono.value,
         username: username.value,

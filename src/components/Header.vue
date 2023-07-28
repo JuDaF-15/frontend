@@ -19,9 +19,9 @@
               </q-item-section>
 
               <q-item-section>
-                  <router-link to="/homeAdmin" style="text-decoration: none;color: black;">
-                    Home
-                  </router-link>
+                <router-link to="/homeAdmin" style="text-decoration: none;color: black;">
+                  Home
+                </router-link>
               </q-item-section>
             </q-item>
 
@@ -39,7 +39,7 @@
 
             <q-item clickable v-ripple>
               <q-item-section avatar>
-                <i class="fa-solid fa-person fa-2xl"></i>
+                <i class="fa-solid fa-cash-register fa-xl"></i>
               </q-item-section>
 
               <q-item-section>
@@ -69,6 +69,30 @@
               <q-item-section>
                 <router-link to="/rutas" style="text-decoration: none;color: black;">
                   Rutas
+                </router-link>
+              </q-item-section>
+            </q-item>
+
+            <q-item clickable v-ripple>
+              <q-item-section avatar>
+                <i class="fa-solid fa-person fa-2xl"></i>
+              </q-item-section>
+
+              <q-item-section>
+                <router-link to="/clientes" style="text-decoration: none;color: black;">
+                  Clientes
+                </router-link>
+              </q-item-section>
+            </q-item>
+
+            <q-item clickable v-ripple>
+              <q-item-section avatar>
+                <i class="fa-solid fa-ticket fa-xl"></i>
+              </q-item-section>
+
+              <q-item-section>
+                <router-link to="/tiquetes" style="text-decoration: none;color: black;">
+                  Tiquetes
                 </router-link>
               </q-item-section>
             </q-item>

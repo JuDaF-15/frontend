@@ -86,7 +86,6 @@ let experiencia = ref("")
 let data = ref([])
 let cc = ref("")
 let alert = ref(false)
-
 traer();
 
 async function traer() {
