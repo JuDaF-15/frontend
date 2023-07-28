@@ -1,19 +1,6 @@
 <template>
   <div>
-    <!-- <div>
-      <input type="text" v-model="matricula" placeholder="matricula" style="width: fit-content;">
-      <select style="width: fit-content;" v-model="c">
-        <option value="">Seleccione el conductor...</option>
-        <option v-for="(conductor, i) in conduc" :key="i" :value="conductor._id">
-          {{ conductor.nombre }}
-        </option>
-      </select>
-      <input type="text" v-model="tipo" placeholder="tipo" style="width: fit-content;">
-      <input type="text" v-model="marca" placeholder="marca" style="margin-top: 10px;width: fit-content;">
-      <input type="text" v-model="modelo" placeholder="modelo" style="margin-top: 10px;width: fit-content;">
-      <input type="number" v-model="capacidad" placeholder="capacidad" style="margin-top: 10px;width: fit-content;">
-    </div><br> -->
-
+    
     <div>
       <q-btn label="Registrar Vehículo" color="primary" @click="alert = true" />
     </div><br><br>
