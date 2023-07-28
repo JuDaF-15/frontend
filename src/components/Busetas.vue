@@ -12,7 +12,7 @@
       <input type="text" v-model="tipo" placeholder="tipo" style="width: fit-content;">
       <input type="text" v-model="marca" placeholder="marca" style="margin-top: 10px;width: fit-content;">
       <input type="text" v-model="modelo" placeholder="modelo" style="margin-top: 10px;width: fit-content;">
-      <input type="text" v-model="capacidad" placeholder="capacidad" style="margin-top: 10px;width: fit-content;">
+      <input type="number" v-model="capacidad" placeholder="capacidad" style="margin-top: 10px;width: fit-content;">
     </div><br>
 
     <p>{{ c }}</p>
