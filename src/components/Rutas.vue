@@ -1,6 +1,7 @@
 <template>
     <div>
         <div>
+            <input type="text" v-model="nombre" placeholder="nombre" style="width: fit-content;">
             <input type="text" v-model="origen" placeholder="origen" style="width: fit-content;">
             <input type="text" v-model="destino" placeholder="destino" style="width: fit-content;">
             <input type="number" v-model="valor" placeholder="valor" style="margin-top: 10px;width: fit-content;">
@@ -16,6 +17,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th>Nombre</th>
                         <th>Origen</th>
                         <th>Destino</th>
                         <th>Valor</th>
@@ -24,6 +26,7 @@
                 </thead>
                 <tbody>
                     <tr v-for="ruta in data" :key="ruta">
+                        <td>{{ ruta.nombre }}</td>
                         <td>{{ ruta.origen }}</td>
                         <td>{{ ruta.destino }}</td>
                         <td>{{ ruta.valor }}</td>
@@ -45,6 +48,7 @@ import { useRutaStore } from "../stores/rutas.js"
 import { ref } from "vue"
 
 const useRuta = useRutaStore()
+let nombre = ref("")
 let origen = ref("")
 let destino = ref("")
 let valor = ref("")
@@ -60,6 +64,7 @@ async function traer() {
 
 async function registrar() {
     let res = await useRuta.registrarRuta({
+        nombre : nombre.value,
         origen: origen.value,
         destino: destino.value,
         valor: valor.value,

@@ -16,7 +16,7 @@
                         <q-input style="margin-top: 10px;" outlined label="Nombre" v-model="nombre" />
                         <q-input style="margin-top: 10px;" outlined label="Teléfono" v-model="telefono" />
                         <q-input style="margin-top: 10px;" outlined label="Username" v-model="username" />
-                        <q-input style="margin-top: 10px;" outlined label="Contraseña" v-model="clave"  type="password" />
+                        <q-input style="margin-top: 10px;" outlined label="Contraseña" v-model="clave" type="password" />
 
                     </div><br>
                     <q-card-actions align="right">
@@ -35,7 +35,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>cedula</th>
+                        <th>Cédula</th>
                         <th>Nombre</th>
                         <th>Teléfono</th>
                         <th>Username</th>
