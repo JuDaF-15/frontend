@@ -19,7 +19,7 @@
             <q-input style="margin-top: 10px;" outlined label="Categoría Licencia" v-model="categoria_licencia" />
             <q-input style="margin-top: 10px;" outlined label="Fecha de Vencimiento" v-model="fecha_vencimiento"
               type="date" />
-            <q-input style="margin-top: 10px;" outlined label="Experiencia" v-model="experiencia" />
+            <q-input style="margin-top: 5px;" outlined label="Experiencia" v-model="experiencia" />
           </div><br>
 
           <q-card-actions align="right">
@@ -34,7 +34,7 @@
       <q-btn label="Buscar" color="primary" @click="buscarCedula" />
     </div><br>
 
-    <div v-if="!busquedaActiva">
+    <div class="tabla" v-if="!busquedaActiva">
       <table>
         <thead>
           <tr>
@@ -68,7 +68,7 @@
       </table>
     </div>
 
-    <div v-if="busquedaActiva">
+    <div class="tabla" v-if="busquedaActiva">
       <table>
         <thead>
           <tr>
@@ -101,7 +101,7 @@
         </tbody>
       </table>
     </div>
-    
+
   </div>
 </template>
 
@@ -187,11 +187,9 @@ input {
   margin-bottom: 10px;
 }
 
-q-btn {
-  background-color: #0a18e2;
-  color: #fff;
-  padding: 10px;
-  border: none;
+.tabla{
+  height: 60vh;
+  overflow-y: auto;
 }
 
 table {

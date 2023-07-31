@@ -29,7 +29,7 @@
             <input type="text" placeholder="Cédula" style="width: 20%;" v-model="cc">
             <q-btn label="Buscar" color="primary" @click="buscarCedula" />
         </div><br>
-        <div v-if="!busquedaActiva">
+        <div class="tabla" v-if="!busquedaActiva">
             <table>
                 <thead>
                     <tr>
@@ -48,7 +48,8 @@
                         <td>{{ empleado.username }}</td>
                         <td>
                             <div>
-                                <q-btn color="primary" style="margin-right: 5px;">✏️</q-btn>
+                                <q-btn color="primary" style="margin-right: 5px;"
+                                    @click="mostrarFormulario(empleado._id)">✏️</q-btn>
                                 <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
                             </div>
                         </td>
@@ -57,7 +58,7 @@
             </table>
         </div>
 
-        <div v-if="busquedaActiva">
+        <div class="tabla" v-if="busquedaActiva">
             <table>
                 <thead>
                     <tr>
@@ -84,8 +85,6 @@
                 </tbody>
             </table>
         </div>
-
-
     </div>
 </template>
   
@@ -105,6 +104,7 @@ let alert = ref(false)
 let data = ref([])
 let encontrado = ref("")
 let busquedaActiva = ref(false)
+
 
 traer();
 
@@ -164,11 +164,10 @@ input {
     margin-bottom: 10px;
 }
 
-button {
-    background-color: #0a18e2;
-    color: #fff;
-    padding: 10px;
-    border: none;
+
+.tabla{
+    height: 60vh;
+    overflow-y: auto;
 }
 
 table {

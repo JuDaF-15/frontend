@@ -28,7 +28,7 @@
             <q-btn label="Buscar" color="primary" @click="buscarCedula" />
         </div><br>
 
-        <div v-if="!busquedaActiva">
+        <div class="tabla" v-if="!busquedaActiva">
             <table>
                 <thead>
                     <tr>
@@ -54,7 +54,7 @@
             </table>
         </div>
 
-        <div v-if="busquedaActiva">
+        <div class="tabla" v-if="busquedaActiva">
             <table>
                 <thead>
                     <tr>
@@ -152,11 +152,9 @@ input {
     margin-bottom: 10px;
 }
 
-button {
-    background-color: #0a18e2;
-    color: #fff;
-    padding: 10px;
-    border: none;
+.tabla{
+    height: 60vh;
+    overflow-y: auto;
 }
 
 table {
