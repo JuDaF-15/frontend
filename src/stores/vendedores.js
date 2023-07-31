@@ -13,6 +13,17 @@ export const useVendedorStore = defineStore("vendedor", () => {
         }
     }
 
+    const traerVendedorCedula = async (cedula) => {
+        try {
+            let datos = await axios.get(`http://localhost:4506/api/empleados/${cedula}`, {
+                params: { cedula: cedula }
+            });
+            return datos;
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     const registrarVendedor = async (info) => {
         try {
             let datos = await axios.post("http://localhost:4506/api/empleados", info)
@@ -24,6 +35,7 @@ export const useVendedorStore = defineStore("vendedor", () => {
 
     return {
         traerVendedor,
-        registrarVendedor
+        registrarVendedor,
+        traerVendedorCedula
     }
 })

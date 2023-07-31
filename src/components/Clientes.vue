@@ -119,13 +119,13 @@ async function registrar() {
     }
 
     if (busquedaActiva.value) {
-        const cedulaConduct = cc.value;
-        encontrado.value = data.value.filter(item => item.cedula.includes(cedulaConduct));
+        const cedulaPasa = cc.value;
+        encontrado.value = data.value.filter(item => item.cedula.includes(cedulaPasa));
     }
 }
 
 async function buscarCedula() {
-    const cedulaPasa = cc.value
+    const cedulaPasa = cc.value.trim()
     let res = await useCliente.traerPasajeroCedula(cedulaPasa)
 
     encontrado.value = data.value.filter((item) =>
@@ -160,7 +160,7 @@ button {
 }
 
 table {
-    width: 50%;
+    width: 100%;
     border-collapse: collapse;
     text-align: center;
 }

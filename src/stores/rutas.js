@@ -13,6 +13,17 @@ export const useRutaStore = defineStore("ruta", () => {
         }
     }
 
+    const traerRutaNombre = async (nombre) => {
+        try {
+            let datos = await axios.get(`http://localhost:4506/api/rutas/${nombre}`, {
+                params: { nombre: nombre }
+            });
+            return datos;
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     const registrarRuta = async (info) => {
         try {
             let datos = await axios.post("http://localhost:4506/api/rutas", info)
@@ -24,6 +35,7 @@ export const useRutaStore = defineStore("ruta", () => {
 
     return {
         traerRuta,
-        registrarRuta
+        registrarRuta,
+        traerRutaNombre
     }
 })

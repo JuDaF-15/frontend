@@ -25,13 +25,11 @@
                 </q-card-section>
             </q-card>
         </q-dialog>
-
         <div>
-            <input type="text" style="width: 20%;" v-model="cc">
-            <button @click="buscarCedula">buscar</button>
+            <input type="text" placeholder="Cédula" style="width: 20%;" v-model="cc">
+            <q-btn label="Buscar" color="primary" @click="buscarCedula" />
         </div><br>
-
-        <div>
+        <div v-if="!busquedaActiva">
             <table>
                 <thead>
                     <tr>
@@ -50,14 +48,44 @@
                         <td>{{ empleado.username }}</td>
                         <td>
                             <div>
-                                <button style="margin-right: 5px;">✏️</button>
-                                <button style="margin-left: 5px;">⛔</button>
+                                <q-btn color="primary" style="margin-right: 5px;">✏️</q-btn>
+                                <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
                             </div>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
+
+        <div v-if="busquedaActiva">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cédula</th>
+                        <th>Nombre</th>
+                        <th>Teléfono</th>
+                        <th>Username</th>
+                        <th>Opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="empleado in encontrado" :key="empleado">
+                        <td>{{ empleado.cedula }}</td>
+                        <td>{{ empleado.nombre }}</td>
+                        <td>{{ empleado.telefono }}</td>
+                        <td>{{ empleado.username }}</td>
+                        <td>
+                            <div>
+                                <q-btn color="primary" style="margin-right: 5px;">✏️</q-btn>
+                                <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
     </div>
 </template>
   
@@ -72,8 +100,11 @@ let telefono = ref("")
 let username = ref("")
 let clave = ref("")
 
+let cc = ref("")
 let alert = ref(false)
 let data = ref([])
+let encontrado = ref("")
+let busquedaActiva = ref(false)
 
 traer();
 
@@ -92,9 +123,35 @@ async function registrar() {
         clave: clave.value
     })
 
+    vaciar()
+
     if (data) {
         data.value.push(res.data.empleado);
     }
+
+    if (busquedaActiva.value) {
+        const cedulaEmple = cc.value;
+        encontrado.value = data.value.filter(item => item.cedula.includes(cedulaEmple));
+    }
+}
+
+async function buscarCedula() {
+    const cedulaEmple = cc.value.trim()
+    let res = await useVendedor.traerVendedorCedula(cedulaEmple)
+
+    encontrado.value = data.value.filter((item) =>
+        item.cedula.includes(cedulaEmple)
+    )
+    busquedaActiva.value = true
+    return res
+}
+
+function vaciar() {
+    cedula.value = ""
+    nombre.value = ""
+    telefono.value = ""
+    username.value = ""
+    clave.value = ""
 }
 
 </script>

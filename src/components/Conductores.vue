@@ -157,7 +157,7 @@ async function registrar() {
 }
 
 async function buscarCedula() {
-  const cedulaConduct = cc.value // cedula v-model
+  const cedulaConduct = cc.value.trim()
   let res = await useConductor.traerConductorCedula(cedulaConduct)
 
   encontrado.value = data.value.filter((item) =>
