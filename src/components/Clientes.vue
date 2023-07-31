@@ -1,24 +1,41 @@
 <template>
     <div>
         <div>
-            <input type="text" v-model="documento" placeholder="documento" style="width: fit-content;">
-            <input type="text" v-model="nombre" placeholder="nombre" style="width: fit-content;">
-            <input type="text" v-model="telefono" placeholder="telefono" style="margin-top: 10px;width: fit-content;">
-        </div><br>
+            <q-btn label="Registrar Cliente" color="primary" @click="alert = true" />
+        </div><br><br>
+        <q-dialog v-model="alert">
+            <q-card style="width: 32%;">
+                <q-card-section>
+                    <div class="text-h6">Registrar Cliente</div>
+                </q-card-section>
+
+                <q-card-section class="q-pt-none">
+                    <div>
+                        <q-input outlined label="Cédula" v-model="cedula" />
+                        <q-input style="margin-top: 10px;" outlined label="Nombre" v-model="nombre" />
+                        <q-input style="margin-top: 10px;" outlined label="Teléfono" v-model="telefono" />
+                    </div><br>
+
+                    <q-card-actions align="right">
+                        <q-btn style="margin-top: -10px;" label="Guardar" color="primary" @click="registrar" />
+                    </q-card-actions>
+                </q-card-section>
+            </q-card>
+        </q-dialog>
 
         <div>
-            <button @click="registrar()">
-                guardar
-            </button>
+            <input type="text" placeholder="Cédula" style="width: 20%;" v-model="cc">
+            <q-btn label="Buscar" color="primary" @click="buscarCedula" />
         </div><br>
 
-        <div>
+        <div v-if="!busquedaActiva">
             <table>
                 <thead>
                     <tr>
-                        <th>Documento</th>
+                        <th>Cédula</th>
                         <th>Nombre</th>
                         <th>Teléfono</th>
+                        <th>Opciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -26,6 +43,38 @@
                         <td>{{ cliente.cedula }}</td>
                         <td>{{ cliente.nombre }}</td>
                         <td>{{ cliente.telefono }}</td>
+                        <td>
+                            <div>
+                                <q-btn color="primary" style="margin-right: 5px;">✏️</q-btn>
+                                <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div v-if="busquedaActiva">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cédula</th>
+                        <th>Nombre</th>
+                        <th>Teléfono</th>
+                        <th>Opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="cliente in encontrado" :key="cliente">
+                        <td>{{ cliente.cedula }}</td>
+                        <td>{{ cliente.nombre }}</td>
+                        <td>{{ cliente.telefono }}</td>
+                        <td>
+                            <div>
+                                <q-btn color="primary" style="margin-right: 5px;">✏️</q-btn>
+                                <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
+                            </div>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -38,30 +87,60 @@ import { useClienteStore } from "../stores/clientes.js"
 import { ref } from "vue"
 
 const useCliente = useClienteStore()
-let documento = ref("")
+let cedula = ref("")
 let nombre = ref("")
 let telefono = ref("")
+
 let data = ref([])
+let cc = ref("")
+let alert = ref(false)
+let encontrado = ref("")
+let busquedaActiva = ref(false)
 
 traer();
 
 async function traer() {
     let res = await useCliente.traerCliente()
     console.log(res);
-    data.value = res.data.cliente
+    data.value = res.data.pasajero
 }
 
 async function registrar() {
     let res = await useCliente.registrarCliente({
-        cedula: documento.value,
+        cedula: cedula.value,
         nombre: nombre.value,
-        telefono: telefono.value,
+        telefono: telefono.value
     })
 
+    vaciar()
+
     if (data) {
-        data.value.push(res.data.cliente);
+        data.value.push(res.data.pasajero);
+    }
+
+    if (busquedaActiva.value) {
+        const cedulaConduct = cc.value;
+        encontrado.value = data.value.filter(item => item.cedula.includes(cedulaConduct));
     }
 }
+
+async function buscarCedula() {
+    const cedulaPasa = cc.value
+    let res = await useCliente.traerPasajeroCedula(cedulaPasa)
+
+    encontrado.value = data.value.filter((item) =>
+        item.cedula.includes(cedulaPasa)
+    )
+    busquedaActiva.value = true
+    return res
+}
+
+function vaciar() {
+    cedula.value = ""
+    nombre.value = ""
+    telefono.value = ""
+}
+
 
 </script>
   
@@ -83,6 +162,7 @@ button {
 table {
     width: 50%;
     border-collapse: collapse;
+    text-align: center;
 }
 
 th,

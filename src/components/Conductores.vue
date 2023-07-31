@@ -30,11 +30,11 @@
     </q-dialog>
 
     <div>
-      <input type="text" style="width: 20%;" v-model="cc">
-      <button @click="buscarCedula">buscar</button>
+      <input type="text" placeholder="Cédula" style="width: 20%;" v-model="cc">
+      <q-btn label="Buscar" color="primary" @click="buscarCedula" />
     </div><br>
 
-    <div>
+    <div v-if="!busquedaActiva">
       <table>
         <thead>
           <tr>
@@ -59,14 +59,49 @@
             <td>{{ chofer.experiencia }}</td>
             <td>
               <div>
-                <button style="margin-right: 5px;">✏️</button>
-                <button style="margin-left: 5px;">⛔</button>
+                <q-btn color="primary" style="margin-right: 5px;">✏️</q-btn>
+                <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
               </div>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
+
+    <div v-if="busquedaActiva">
+      <table>
+        <thead>
+          <tr>
+            <th>Cédula</th>
+            <th>Nombre</th>
+            <th>Teléfono</th>
+            <th>No. Licencia</th>
+            <th>Cat. Licencia</th>
+            <th>Fecha de Vencimiento</th>
+            <th>Experiencia</th>
+            <th>Opciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="chofer in encontrado" :key="chofer">
+            <td>{{ chofer.cedula }}</td>
+            <td>{{ chofer.nombre }}</td>
+            <td>{{ chofer.telefono }}</td>
+            <td>{{ chofer.numero_licencia }}</td>
+            <td>{{ chofer.categoria_licencia }}</td>
+            <td>{{ chofer.fecha_vencimiento }}</td>
+            <td>{{ chofer.experiencia }}</td>
+            <td>
+              <div>
+                <q-btn color="primary" style="margin-right: 5px;">✏️</q-btn>
+                <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
   </div>
 </template>
 
@@ -86,6 +121,9 @@ let experiencia = ref("")
 let data = ref([])
 let cc = ref("")
 let alert = ref(false)
+let encontrado = ref("")
+let busquedaActiva = ref(false)
+
 traer();
 
 async function traer() {
@@ -104,10 +142,16 @@ async function registrar() {
     fecha_vencimiento: fecha_vencimiento.value,
     experiencia: experiencia.value
   })
+
   vaciar()
 
   if (data) {
     data.value.push(res.data.chofer);
+  }
+
+  if (busquedaActiva.value) {
+    const cedulaConduct = cc.value;
+    encontrado.value = data.value.filter(item => item.cedula.includes(cedulaConduct));
   }
 
 }
@@ -115,7 +159,11 @@ async function registrar() {
 async function buscarCedula() {
   const cedulaConduct = cc.value // cedula v-model
   let res = await useConductor.traerConductorCedula(cedulaConduct)
-  console.log(res);
+
+  encontrado.value = data.value.filter((item) =>
+    item.cedula.includes(cedulaConduct)
+  )
+  busquedaActiva.value = true
   return res
 }
 
@@ -139,7 +187,7 @@ input {
   margin-bottom: 10px;
 }
 
-button {
+q-btn {
   background-color: #0a18e2;
   color: #fff;
   padding: 10px;

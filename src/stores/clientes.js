@@ -12,6 +12,16 @@ export const useClienteStore = defineStore("cliente", () => {
             console.log(error);
         }
     }
+    const traerPasajeroCedula = async (cedula) => {
+        try {
+            let datos = await axios.get(`http://localhost:4506/api/pasajeros/${cedula}`, {
+                params: { cedula: cedula }
+            });
+            return datos;
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     const registrarCliente = async (info) => {
         try {
@@ -24,6 +34,7 @@ export const useClienteStore = defineStore("cliente", () => {
 
     return {
         traerCliente,
-        registrarCliente
+        registrarCliente,
+        traerPasajeroCedula
     }
 })
