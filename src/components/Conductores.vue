@@ -187,8 +187,8 @@ input {
   margin-bottom: 10px;
 }
 
-.tabla{
-  height: 60vh;
+.tabla {
+  max-height: 60vh;
   overflow-y: auto;
 }
 
@@ -201,11 +201,15 @@ table {
 th,
 td {
   border: 1px solid #ccc;
-  padding: 8px;
+  padding: 10px;
 }
 
 thead {
-  background-color: #f2f2f2;
+  background-color: #1190c2;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 tbody tr:nth-child(even) {

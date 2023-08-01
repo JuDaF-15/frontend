@@ -32,9 +32,21 @@ export const useClienteStore = defineStore("cliente", () => {
         }
     }
 
+    const actualizarCliente = async (id, cedula, nombre, telefono) => {
+        try {
+            let datos = await axios.put(`http://localhost:4506/api/pasajeros/${id}`, {
+                cedula, nombre, telefono
+            });
+            return datos;
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     return {
         traerCliente,
         registrarCliente,
-        traerPasajeroCedula
+        traerPasajeroCedula,
+        actualizarCliente
     }
 })

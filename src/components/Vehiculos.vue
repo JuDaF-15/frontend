@@ -33,7 +33,7 @@
 
     <p>{{ c }}</p>
 
-    <div>
+    <div class="tabla">
       <table>
         <thead>
           <tr>
@@ -139,6 +139,19 @@ button {
   border: none;
 }
 
+.tabla{
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+thead {
+  background-color: #1190c2;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -149,10 +162,6 @@ th,
 td {
   border: 1px solid #ccc;
   padding: 8px;
-}
-
-thead {
-  background-color: #f2f2f2;
 }
 
 tbody tr:nth-child(even) {

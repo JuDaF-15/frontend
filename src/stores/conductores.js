@@ -33,9 +33,9 @@ export const useConductorStore = defineStore("chofer", () => {
     }
   };
 
-  const actualizarConductor = async (cedula, info) => {
+  const actualizarConductor = async (id, info) => {
     try {
-      let datos = await axios.put(`http://localhost:4506/api/choferes/${cedula}`, info);
+      let datos = await axios.put(`http://localhost:4506/api/choferes/${id}`, info);
       return datos;
     } catch (error) {
       console.log(error);

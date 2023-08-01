@@ -176,6 +176,7 @@ table {
     border-collapse: collapse;
 }
 
+
 th,
 td {
     border: 1px solid #ccc;
@@ -183,7 +184,11 @@ td {
 }
 
 thead {
-    background-color: #f2f2f2;
+  background-color: #1190c2;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 tbody tr:nth-child(even) {

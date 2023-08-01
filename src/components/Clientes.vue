@@ -1,12 +1,12 @@
 <template>
     <div>
         <div>
-            <q-btn label="Registrar Cliente" color="primary" @click="alert = true" />
+            <q-btn label="Registrar Cliente" color="primary" @click="nuevo(); alert = true" />
         </div><br><br>
         <q-dialog v-model="alert">
             <q-card style="width: 32%;">
                 <q-card-section>
-                    <div class="text-h6">Registrar Cliente</div>
+                    <div class="text-h6">{{ bd === 0 ? 'Editar Cliente' : 'Registrar Cliente' }}</div>
                 </q-card-section>
 
                 <q-card-section class="q-pt-none">
@@ -17,7 +17,9 @@
                     </div><br>
 
                     <q-card-actions align="right">
-                        <q-btn style="margin-top: -10px;" label="Guardar" color="primary" @click="registrar" />
+                        <q-btn v-if="bd == 1" style="margin-top: -10px;" label="Guardar" color="primary"
+                            @click="registrar" />
+                        <q-btn v-else style="margin-top: -10px;" label="Actualizar" color="primary" @click="actualizar" />
                     </q-card-actions>
                 </q-card-section>
             </q-card>
@@ -45,7 +47,7 @@
                         <td>{{ cliente.telefono }}</td>
                         <td>
                             <div>
-                                <q-btn color="primary" style="margin-right: 5px;">✏️</q-btn>
+                                <q-btn color="primary" @click="editarCliente(cliente)" style="margin-right: 5px;">✏️</q-btn>
                                 <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
                             </div>
                         </td>
@@ -71,7 +73,7 @@
                         <td>{{ cliente.telefono }}</td>
                         <td>
                             <div>
-                                <q-btn color="primary" style="margin-right: 5px;">✏️</q-btn>
+                                <q-btn color="primary" @click="editarCliente(cliente)" style="margin-right: 5px;">✏️</q-btn>
                                 <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
                             </div>
                         </td>
@@ -93,11 +95,19 @@ let telefono = ref("")
 
 let data = ref([])
 let cc = ref("")
+let id = ref("")
 let alert = ref(false)
 let encontrado = ref("")
 let busquedaActiva = ref(false)
+let bd = ref(null);
+
 
 traer();
+
+function nuevo() {
+    bd.value = 1
+    vaciar()
+}
 
 async function traer() {
     let res = await useCliente.traerCliente()
@@ -122,6 +132,7 @@ async function registrar() {
         const cedulaPasa = cc.value;
         encontrado.value = data.value.filter(item => item.cedula.includes(cedulaPasa));
     }
+
 }
 
 async function buscarCedula() {
@@ -135,12 +146,26 @@ async function buscarCedula() {
     return res
 }
 
+function editarCliente(cliente) {
+    bd.value = 0
+    id.value = cliente._id
+    cedula.value = cliente.cedula;
+    nombre.value = cliente.nombre;
+    telefono.value = cliente.telefono;
+    alert.value = true;
+    console.log(cliente);
+}
+
+async function actualizar() {
+    const res = await useCliente.actualizarCliente(id.value, cedula.value, nombre.value, telefono.value)
+    console.log(res);
+    traer()
+}
 function vaciar() {
     cedula.value = ""
     nombre.value = ""
     telefono.value = ""
 }
-
 
 </script>
   
@@ -152,7 +177,7 @@ input {
     margin-bottom: 10px;
 }
 
-.tabla{
+.tabla {
     height: 60vh;
     overflow-y: auto;
 }
@@ -170,13 +195,14 @@ td {
 }
 
 thead {
-    background-color: #f2f2f2;
+    background-color: #1190c2;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
 
 tbody tr:nth-child(even) {
     background-color: #f2f2f2;
 }
 </style>
-  
-
-  
