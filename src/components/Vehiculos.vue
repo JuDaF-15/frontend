@@ -53,7 +53,7 @@
         <tbody>
           <tr v-for="vehiculo in data" :key="vehiculo.matricula">
             <td>{{ vehiculo.matricula }}</td>
-            <td>{{ vehiculo.conductor }}</td>
+            <td>{{ vehiculo.chofer_id.nombre }}</td>
             <td>{{ vehiculo.tipo }}</td>
             <td>{{ vehiculo.marca }}</td>
             <td>{{ vehiculo.modelo }}</td>
@@ -85,7 +85,7 @@
         <tbody>
           <tr v-for="vehiculo in encontrado" :key="vehiculo.matricula">
             <td>{{ vehiculo.matricula }}</td>
-            <td>{{ vehiculo.conductor }}</td>
+            <td>{{ vehiculo.chofer_id.nombre }}</td>
             <td>{{ vehiculo.tipo }}</td>
             <td>{{ vehiculo.marca }}</td>
             <td>{{ vehiculo.modelo }}</td>
@@ -147,12 +147,14 @@ async function traer() {
 async function registrar() {
   let res = await useVehiculo.registrarVehiculo({
     matricula: matricula.value,
-    conductor: c.value,
+    chofer_id: c.value,
     tipo: tipo.value,
     marca: modelo.value,
     modelo: modelo.value,
     capacidad: capacidad.value
   })
+
+  console.log(res);
 
   alert.value = false
   vaciar()
