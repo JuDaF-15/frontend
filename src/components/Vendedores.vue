@@ -1,13 +1,13 @@
 <template>
     <div>
         <div>
-            <q-btn label="Registrar Vendedor" color="primary" @click="alert = true" />
+            <q-btn label="Registrar Vendedor" color="primary" @click="alert = true; nuevo()" />
         </div><br><br>
 
         <q-dialog v-model="alert">
             <q-card style="width: 32%;">
                 <q-card-section>
-                    <div class="text-h6">Registrar Vendedor</div>
+                    <div class="text-h6">{{ bd === 0 ? 'Editar Vendedor' : 'Registrar Vendedor' }}</div>
                 </q-card-section>
 
                 <q-card-section class="q-pt-none">
@@ -20,7 +20,9 @@
 
                     </div><br>
                     <q-card-actions align="right">
-                        <q-btn style="margin-top: -10px;" label="Guardar" color="primary" @click="registrar" />
+                        <q-btn v-if="bd == 1" style="margin-top: -10px;" label="Guardar" color="primary"
+                            @click="registrar" />
+                        <q-btn v-else style="margin-top: -10px;" label="Actualizar" color="primary" @click="actualizar" />
                     </q-card-actions>
                 </q-card-section>
             </q-card>
@@ -49,7 +51,7 @@
                         <td>
                             <div>
                                 <q-btn color="primary" style="margin-right: 5px;"
-                                    @click="mostrarFormulario(empleado._id)">✏️</q-btn>
+                                    @click="editarEmpleado(empleado)">✏️</q-btn>
                                 <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
                             </div>
                         </td>
@@ -77,7 +79,8 @@
                         <td>{{ empleado.username }}</td>
                         <td>
                             <div>
-                                <q-btn color="primary" style="margin-right: 5px;">✏️</q-btn>
+                                <q-btn color="primary" style="margin-right: 5px;"
+                                    @click="editarEmpleado(empleado)">✏️</q-btn>
                                 <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
                             </div>
                         </td>
@@ -102,11 +105,17 @@ let clave = ref("")
 let cc = ref("")
 let alert = ref(false)
 let data = ref([])
+let id = ref("")
+let bd = ref("")
 let encontrado = ref("")
 let busquedaActiva = ref(false)
 
-
 traer();
+
+function nuevo() {
+    bd.value = 1
+    vaciar()
+}
 
 async function traer() {
     let res = await useVendedor.traerVendedor()
@@ -122,7 +131,7 @@ async function registrar() {
         username: username.value,
         clave: clave.value
     })
-
+    alert.value = false
     vaciar()
 
     if (data) {
@@ -154,6 +163,36 @@ function vaciar() {
     clave.value = ""
 }
 
+function editarEmpleado(empleado) {
+    bd.value = 0
+    id.value = empleado._id
+    cedula.value = empleado.cedula
+    nombre.value = empleado.nombre;
+    telefono.value = empleado.telefono
+    username.value = empleado.username
+    clave.value = empleado.clave
+
+    alert.value = true;
+    console.log(empleado);
+}
+
+async function actualizar() {
+    const res = await useVendedor.actualizarVendedor(id.value, cedula.value, nombre.value,
+        telefono.value, username.value, clave.value)
+    console.log(res);
+
+    const indexActualizado = data.value.findIndex((vendedor) => vendedor._id === id.value);
+    if (indexActualizado !== -1) {
+        data.value[indexActualizado].cedula = cedula.value;
+        data.value[indexActualizado].nombre = nombre.value;
+        data.value[indexActualizado].telefono = telefono.value;
+        data.value[indexActualizado].username = username.value;
+        data.value[indexActualizado].clave = clave.value;
+    }
+    alert.value = false
+    traer()
+}
+
 </script>
   
 <style scoped>
@@ -165,7 +204,7 @@ input {
 }
 
 
-.tabla{
+.tabla {
     height: 60vh;
     overflow-y: auto;
 }
@@ -184,11 +223,11 @@ td {
 }
 
 thead {
-  background-color: #1190c2;
-  color: white;
-  position: sticky;
-  top: 0;
-  z-index: 1;
+    background-color: #1190c2;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
 
 tbody tr:nth-child(even) {

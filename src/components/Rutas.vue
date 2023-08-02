@@ -1,13 +1,13 @@
 <template>
     <div>
         <div>
-            <q-btn label="Registrar Ruta" color="primary" @click="alert = true" />
+            <q-btn label="Registrar Ruta" color="primary" @click="alert = true; nuevo()" />
         </div><br><br>
 
         <q-dialog v-model="alert">
             <q-card style="width: 32%;">
                 <q-card-section>
-                    <div class="text-h6">Registrar Ruta</div>
+                    <div class="text-h6">{{ bd === 0 ? 'Editar Ruta' : 'Registrar Ruta' }}</div>
                 </q-card-section>
 
                 <q-card-section class="q-pt-none">
@@ -18,7 +18,9 @@
                         <q-input style="margin-top: 10px;" type="number" outlined label="Valor" v-model="valor" />
                     </div><br>
                     <q-card-actions align="right">
-                        <q-btn style="margin-top: -10px;" label="Guardar" color="primary" @click="registrar" />
+                        <q-btn v-if="bd == 1" style="margin-top: -10px;" label="Guardar" color="primary"
+                            @click="registrar" />
+                        <q-btn v-else style="margin-top: -10px;" label="Actualizar" color="primary" @click="actualizar" />
                     </q-card-actions>
                 </q-card-section>
             </q-card>
@@ -46,7 +48,7 @@
                         <td>{{ ruta.valor }}</td>
                         <td>
                             <div>
-                                <q-btn color="primary" style="margin-right: 5px;">✏️</q-btn>
+                                <q-btn color="primary" style="margin-right: 5px;" @click="editarRuta(ruta)">✏️</q-btn>
                                 <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
                             </div>
                         </td>
@@ -74,7 +76,7 @@
                         <td>{{ ruta.valor }}</td>
                         <td>
                             <div>
-                                <q-btn color="primary" style="margin-right: 5px;">✏️</q-btn>
+                                <q-btn color="primary" style="margin-right: 5px;" @click="editarRuta(ruta)">✏️</q-btn>
                                 <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
                             </div>
                         </td>
@@ -97,11 +99,18 @@ let valor = ref("")
 
 let nom = ref("")
 let alert = ref(false)
+let id = ref("")
+let bd = ref("")
 let encontrado = ref("")
 let busquedaActiva = ref(false)
 let data = ref([])
 
 traer();
+
+function nuevo() {
+    bd.value = 1
+    vaciar()
+}
 
 async function traer() {
     let res = await useRuta.traerRuta()
@@ -117,6 +126,7 @@ async function registrar() {
         valor: valor.value,
     })
 
+    alert.value = false
     vaciar()
 
     if (data) {
@@ -147,7 +157,33 @@ function vaciar() {
     valor.value = ""
 }
 
+function editarRuta(ruta) {
+    bd.value = 0
+    id.value = ruta._id
+    nombre.value = ruta.nombre;
+    origen.value = ruta.origen;
+    destino.value = ruta.destino;
+    valor.value = ruta.valor
 
+    alert.value = true;
+    console.log(ruta);
+}
+
+async function actualizar() {
+    const res = await useRuta.actualizarRuta(id.value, nombre.value, origen.value, destino.value,
+        valor.value)
+    console.log(res);
+
+    const indexActualizado = data.value.findIndex((rutas) => rutas._id === id.value);
+    if (indexActualizado !== -1) {
+        data.value[indexActualizado].nombre = nombre.value;
+        data.value[indexActualizado].origen = origen.value
+        data.value[indexActualizado].destino = destino.value
+        data.value[indexActualizado].valor = valor.value
+    }
+    alert.value = false
+    traer()
+}
 
 </script>
   
@@ -159,17 +195,17 @@ input {
     margin-bottom: 10px;
 }
 
-.tabla{
+.tabla {
     height: 60vh;
     overflow-y: auto;
 }
 
 thead {
-  background-color: #1190c2;
-  color: white;
-  position: sticky;
-  top: 0;
-  z-index: 1;
+    background-color: #1190c2;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
 
 table {
@@ -185,11 +221,11 @@ td {
 }
 
 thead {
-  background-color: #1190c2;
-  color: white;
-  position: sticky;
-  top: 0;
-  z-index: 1;
+    background-color: #1190c2;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
 
 tbody tr:nth-child(even) {

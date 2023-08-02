@@ -2,12 +2,12 @@
   <div>
 
     <div>
-      <q-btn label="Registrar Conductor" color="primary" @click="alert = true" />
+      <q-btn label="Registrar Conductor" color="primary" @click="alert = true; nuevo()" />
     </div><br><br>
     <q-dialog v-model="alert">
       <q-card style="width: 32%;">
         <q-card-section>
-          <div class="text-h6">Registrar Conductor</div>
+          <div class="text-h6">{{ bd === 0 ? 'Editar Conductor' : 'Registrar Conductor' }}</div>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
@@ -23,7 +23,8 @@
           </div><br>
 
           <q-card-actions align="right">
-            <q-btn style="margin-top: -10px;" label="Guardar" color="primary" @click="registrar" />
+            <q-btn v-if="bd == 1" style="margin-top: -10px;" label="Guardar" color="primary" @click="registrar" />
+            <q-btn v-else style="margin-top: -10px;" label="Actualizar" color="primary" @click="actualizar" />
           </q-card-actions>
         </q-card-section>
       </q-card>
@@ -59,7 +60,7 @@
             <td>{{ chofer.experiencia }}</td>
             <td>
               <div>
-                <q-btn color="primary" style="margin-right: 5px;">✏️</q-btn>
+                <q-btn color="primary" style="margin-right: 5px;" @click="editarChofer(chofer)">✏️</q-btn>
                 <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
               </div>
             </td>
@@ -93,7 +94,7 @@
             <td>{{ chofer.experiencia }}</td>
             <td>
               <div>
-                <q-btn color="primary" style="margin-right: 5px;">✏️</q-btn>
+                <q-btn color="primary" style="margin-right: 5px;" @click="editarChofer(chofer)">✏️</q-btn>
                 <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
               </div>
             </td>
@@ -120,11 +121,18 @@ let experiencia = ref("")
 
 let data = ref([])
 let cc = ref("")
+let id = ref("")
+let bd = ref("")
 let alert = ref(false)
 let encontrado = ref("")
 let busquedaActiva = ref(false)
 
 traer();
+
+function nuevo() {
+  bd.value = 1
+  vaciar()
+}
 
 async function traer() {
   let res = await useConductor.traerConductor()
@@ -143,6 +151,7 @@ async function registrar() {
     experiencia: experiencia.value
   })
 
+  alert.value = false
   vaciar()
 
   if (data) {
@@ -175,6 +184,39 @@ function vaciar() {
   categoria_licencia.value = ""
   fecha_vencimiento.value = ""
   experiencia.value = ""
+}
+
+function editarChofer(chofer) {
+  bd.value = 0
+  id.value = chofer._id
+  cedula.value = chofer.cedula;
+  nombre.value = chofer.nombre;
+  telefono.value = chofer.telefono;
+  numero_licencia.value = chofer.numero_licencia
+  categoria_licencia.value = chofer.categoria_licencia
+  fecha_vencimiento.value = chofer.fecha_vencimiento
+  experiencia.value = chofer.experiencia
+  alert.value = true;
+  console.log(chofer);
+}
+
+async function actualizar() {
+  const res = await useConductor.actualizarConductor(id.value, cedula.value, nombre.value, telefono.value,
+    numero_licencia.value, categoria_licencia.value, fecha_vencimiento.value, experiencia.value)
+  console.log(res);
+
+  const indexActualizado = data.value.findIndex((conductor) => conductor._id === id.value);
+  if (indexActualizado !== -1) {
+    data.value[indexActualizado].cedula = cedula.value;
+    data.value[indexActualizado].nombre = nombre.value;
+    data.value[indexActualizado].telefono = telefono.value;
+    data.value[indexActualizado].numero_licencia = numero_licencia.value;
+    data.value[indexActualizado].categoria_licencia = categoria_licencia.value;
+    data.value[indexActualizado].fecha_vencimiento = fecha_vencimiento.value;
+    data.value[indexActualizado].experiencia = experiencia.value;
+  }
+  alert.value = false
+  traer()
 }
 
 </script>

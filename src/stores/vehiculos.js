@@ -13,6 +13,17 @@ export const useVehiculoStore = defineStore("vehiculo", () => {
         }
     }
 
+    const traerVehiculoMatricula = async (matricula) => {
+        try {
+            let datos = await axios.get(`http://localhost:4506/api/vehiculos/${matricula}`, {
+                params: { matricula: matricula }
+            });
+            return datos;
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     const registrarVehiculo = async (info) => {
         try {
             let datos = await axios.post("http://localhost:4506/api/vehiculos", info)
@@ -24,6 +35,7 @@ export const useVehiculoStore = defineStore("vehiculo", () => {
 
     return {
         traerVehiculo,
-        registrarVehiculo
+        registrarVehiculo,
+        traerVehiculoMatricula
     }
 })

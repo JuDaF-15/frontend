@@ -33,9 +33,21 @@ export const useRutaStore = defineStore("ruta", () => {
         }
     }
 
+    const actualizarRuta = async (id, nombre, origen, destino, valor) => {
+        try {
+            let datos = await axios.put(`http://localhost:4506/api/rutas/${id}`, {
+                nombre, origen, destino, valor
+            })
+            return datos
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return {
         traerRuta,
         registrarRuta,
-        traerRutaNombre
+        traerRutaNombre,
+        actualizarRuta
     }
 })

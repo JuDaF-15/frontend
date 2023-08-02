@@ -99,8 +99,7 @@ let id = ref("")
 let alert = ref(false)
 let encontrado = ref("")
 let busquedaActiva = ref(false)
-let bd = ref(null);
-
+let bd = ref("");
 
 traer();
 
@@ -122,6 +121,7 @@ async function registrar() {
         telefono: telefono.value
     })
 
+    alert.value = false
     vaciar()
 
     if (data) {
@@ -159,6 +159,14 @@ function editarCliente(cliente) {
 async function actualizar() {
     const res = await useCliente.actualizarCliente(id.value, cedula.value, nombre.value, telefono.value)
     console.log(res);
+
+    const indexActualizado = data.value.findIndex((client) => client._id === id.value);
+    if (indexActualizado !== -1) {
+        data.value[indexActualizado].cedula = cedula.value;
+        data.value[indexActualizado].nombre = nombre.value;
+        data.value[indexActualizado].telefono = telefono.value;
+    }
+    alert.value = false
     traer()
 }
 function vaciar() {
@@ -166,6 +174,7 @@ function vaciar() {
     nombre.value = ""
     telefono.value = ""
 }
+
 
 </script>
   

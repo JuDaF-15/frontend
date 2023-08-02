@@ -33,9 +33,11 @@ export const useVendedorStore = defineStore("vendedor", () => {
         }
     }
 
-    const actualizarVendedor = async (id, info) => {
+    const actualizarVendedor = async (id, cedula, nombre, telefono, username, clave) => {
         try {
-            let datos = await axios.put(`http://localhost:4506/api/empleados/${id}`, info);
+            let datos = await axios.put(`http://localhost:4506/api/empleados/${id}`, {
+                cedula, nombre, telefono, username, clave
+            });
             return datos;
         } catch (error) {
             console.log(error);

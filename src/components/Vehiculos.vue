@@ -1,6 +1,6 @@
 <template>
   <div>
-    
+
     <div>
       <q-btn label="Registrar Vehículo" color="primary" @click="alert = true" />
     </div><br><br>
@@ -30,10 +30,14 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+    <div>
+      <input type="text" placeholder="Matrícula" style="width: 20%;" v-model="mat">
+      <q-btn label="Buscar" color="primary" @click="buscarMatricula" />
+    </div><br>
 
     <p>{{ c }}</p>
 
-    <div class="tabla">
+    <div class="tabla" v-if="!busquedaActiva">
       <table>
         <thead>
           <tr>
@@ -56,14 +60,48 @@
             <td>{{ vehiculo.capacidad }}</td>
             <td>
               <div>
-                <button style="margin-right: 5px;">✏️</button>
-                <button style="margin-left: 5px;">⛔</button>
+                <q-btn color="primary" style="margin-right: 5px;">✏️</q-btn>
+                <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
               </div>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
+
+    <div class="tabla" v-if="busquedaActiva">
+      <table>
+        <thead>
+          <tr>
+            <th>Matricula</th>
+            <th>Conductor</th>
+            <th>Tipo</th>
+            <th>Marca</th>
+            <th>Modelo</th>
+            <th>Capacidad</th>
+            <th>Opciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="vehiculo in encontrado" :key="vehiculo.matricula">
+            <td>{{ vehiculo.matricula }}</td>
+            <td>{{ vehiculo.conductor }}</td>
+            <td>{{ vehiculo.tipo }}</td>
+            <td>{{ vehiculo.marca }}</td>
+            <td>{{ vehiculo.modelo }}</td>
+            <td>{{ vehiculo.capacidad }}</td>
+            <td>
+              <div>
+                <q-btn color="primary" style="margin-right: 5px;">✏️</q-btn>
+                <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
   </div>
 </template>
   
@@ -82,9 +120,11 @@ let modelo = ref("")
 let capacidad = ref("")
 
 let conduc = ref([])
+let mat = ref("")
+let encontrado = ref("")
+let busquedaActiva = ref(false)
 let data = ref([])
 let c = ref("")
-
 let alert = ref(false)
 
 onMounted(() => {
@@ -114,10 +154,37 @@ async function registrar() {
     capacidad: capacidad.value
   })
 
+  alert.value = false
+  vaciar()
+
   if (data) {
-    // Agregar la nueva dataeta al array
     data.value.push(res.data.vehiculo);
   }
+
+  if (busquedaActiva.value) {
+    const matVeh = mat.value;
+    encontrado.value = data.value.filter(item => item.matricula.includes(matVeh));
+  }
+}
+
+async function buscarMatricula() {
+  const matVeh = mat.value.trim()
+  let res = await useVehiculo.traerVehiculoMatricula(matVeh)
+
+  encontrado.value = data.value.filter((item) =>
+    item.matricula.includes(matVeh)
+  )
+  busquedaActiva.value = true
+  return res
+}
+
+function vaciar() {
+  matricula.value = ""
+  c.value = ""
+  tipo.value = ""
+  marca.value = ""
+  modelo.value = ""
+  capacidad.value = ""
 }
 
 console.log(data);
@@ -139,7 +206,7 @@ button {
   border: none;
 }
 
-.tabla{
+.tabla {
   max-height: 60vh;
   overflow-y: auto;
 }
