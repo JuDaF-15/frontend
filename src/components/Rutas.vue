@@ -37,6 +37,7 @@
                         <th>Origen</th>
                         <th>Destino</th>
                         <th>Valor</th>
+                        <th>Estado</th>
                         <th>Opciones</th>
                     </tr>
                 </thead>
@@ -46,10 +47,16 @@
                         <td>{{ ruta.origen }}</td>
                         <td>{{ ruta.destino }}</td>
                         <td>{{ ruta.valor }}</td>
+                        <td :style="{ color: ruta.estado === 1 ? 'green' : 'red' }">{{ ruta.estado === 1 ? 'Activo'
+                            :
+                            'Inactivo'
+                        }}</td>
                         <td>
                             <div>
                                 <q-btn color="primary" style="margin-right: 5px;" @click="editarRuta(ruta)">✏️</q-btn>
-                                <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
+                                <q-btn color="primary" style="margin-left: 5px;" @click="estado(ruta)"
+                                    v-if="ruta.estado === 1">❌</q-btn>
+                                <q-btn color="primary" style="margin-left: 5px;" @click="estado(ruta)" v-else>✅</q-btn>
                             </div>
                         </td>
                     </tr>
@@ -65,6 +72,7 @@
                         <th>Origen</th>
                         <th>Destino</th>
                         <th>Valor</th>
+                        <th>Estado</th>
                         <th>Opciones</th>
                     </tr>
                 </thead>
@@ -74,10 +82,16 @@
                         <td>{{ ruta.origen }}</td>
                         <td>{{ ruta.destino }}</td>
                         <td>{{ ruta.valor }}</td>
+                        <td :style="{ color: ruta.estado === 1 ? 'green' : 'red' }">{{ ruta.estado === 1 ? 'Activo'
+                            :
+                            'Inactivo'
+                        }}</td>
                         <td>
                             <div>
                                 <q-btn color="primary" style="margin-right: 5px;" @click="editarRuta(ruta)">✏️</q-btn>
-                                <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
+                                <q-btn color="primary" style="margin-left: 5px;" @click="estado(ruta)"
+                                    v-if="ruta.estado === 1">❌</q-btn>
+                                <q-btn color="primary" style="margin-left: 5px;" @click="estado(ruta)" v-else>✅</q-btn>
                             </div>
                         </td>
                     </tr>
@@ -116,6 +130,7 @@ async function traer() {
     let res = await useRuta.traerRuta()
     console.log(res);
     data.value = res.data.ruta
+    data.value.reverse()
 }
 
 async function registrar() {
@@ -130,13 +145,26 @@ async function registrar() {
     vaciar()
 
     if (data) {
-        data.value.push(res.data.ruta);
+        data.value.unshift(res.data.ruta);
     }
 
     if (busquedaActiva.value) {
         const nomRuta = nom.value;
         encontrado.value = data.value.filter(item => item.nombre.includes(nomRuta));
     }
+}
+
+async function estado(ruta) {
+    console.log(ruta);
+
+    if (ruta.estado === 1) {
+        ruta.estado = 0
+    } else {
+        ruta.estado = 1
+    }
+    const res = await useRuta.actualizarEstado(ruta._id, ruta.estado)
+    console.log(res);
+    traer()
 }
 
 async function buscarNombre() {

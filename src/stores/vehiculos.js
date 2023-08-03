@@ -33,9 +33,33 @@ export const useVehiculoStore = defineStore("vehiculo", () => {
         }
     }
 
+    const actualizarVehiculo = async (id, matricula, c, tipo, marca, modelo, capacidad) => {
+        try {
+            let datos = await axios.put(`http://localhost:4506/api/vehiculos/${id}`, {
+                matricula, c, tipo, marca, modelo, capacidad
+            })
+            return datos
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const actualizarEstado = async (id, estado) => {
+        try {
+            let datos = await axios.patch(`http://localhost:4506/api/vehiculos/${id}`,
+                { estado: estado }
+            )
+            return datos
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return {
         traerVehiculo,
         registrarVehiculo,
-        traerVehiculoMatricula
+        traerVehiculoMatricula,
+        actualizarVehiculo,
+        actualizarEstado
     }
 })

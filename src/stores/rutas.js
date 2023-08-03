@@ -44,10 +44,22 @@ export const useRutaStore = defineStore("ruta", () => {
         }
     }
 
+    const actualizarEstado = async (id, estado) => {
+        try {
+            let datos = await axios.patch(`http://localhost:4506/api/rutas/${id}`,
+                { estado: estado }
+            )
+            return datos
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return {
         traerRuta,
         registrarRuta,
         traerRutaNombre,
-        actualizarRuta
+        actualizarRuta,
+        actualizarEstado
     }
 })

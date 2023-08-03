@@ -4,6 +4,7 @@
     <div>
       <q-btn label="Registrar Conductor" color="primary" @click="alert = true; nuevo()" />
     </div><br><br>
+
     <q-dialog v-model="alert">
       <q-card style="width: 32%;">
         <q-card-section>
@@ -29,12 +30,10 @@
         </q-card-section>
       </q-card>
     </q-dialog>
-
     <div>
       <input type="text" placeholder="Cédula" style="width: 20%;" v-model="cc">
       <q-btn label="Buscar" color="primary" @click="buscarCedula" />
     </div><br>
-
     <div class="tabla" v-if="!busquedaActiva">
       <table>
         <thead>
@@ -46,6 +45,7 @@
             <th>Cat. Licencia</th>
             <th>Fecha de Vencimiento</th>
             <th>Experiencia</th>
+            <th>Estado</th>
             <th>Opciones</th>
           </tr>
         </thead>
@@ -58,10 +58,14 @@
             <td>{{ chofer.categoria_licencia }}</td>
             <td>{{ chofer.fecha_vencimiento }}</td>
             <td>{{ chofer.experiencia }}</td>
+            <td :style="{ color: chofer.estado === 1 ? 'green' : 'red' }">{{ chofer.estado === 1 ? 'Activo' : 'Inactivo'
+            }}</td>
             <td>
               <div>
                 <q-btn color="primary" style="margin-right: 5px;" @click="editarChofer(chofer)">✏️</q-btn>
-                <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
+                <q-btn color="primary" style="margin-left: 5px;" @click="estado(chofer)"
+                  v-if="chofer.estado === 1">❌</q-btn>
+                <q-btn color="primary" style="margin-left: 5px;" @click="estado(chofer)" v-else>✅</q-btn>
               </div>
             </td>
           </tr>
@@ -80,6 +84,7 @@
             <th>Cat. Licencia</th>
             <th>Fecha de Vencimiento</th>
             <th>Experiencia</th>
+            <th>Estado</th>
             <th>Opciones</th>
           </tr>
         </thead>
@@ -92,16 +97,21 @@
             <td>{{ chofer.categoria_licencia }}</td>
             <td>{{ chofer.fecha_vencimiento }}</td>
             <td>{{ chofer.experiencia }}</td>
+            <td :style="{ color: chofer.estado === 1 ? 'green' : 'red' }">{{ chofer.estado === 1 ? 'Activo' : 'Inactivo'
+            }}</td>
             <td>
               <div>
                 <q-btn color="primary" style="margin-right: 5px;" @click="editarChofer(chofer)">✏️</q-btn>
-                <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
+                <q-btn color="primary" style="margin-left: 5px;" @click="estado(chofer)"
+                  v-if="chofer.estado === 1">❌</q-btn>
+                <q-btn color="primary" @click="estado(chofer)" style="margin-left: 5px;" v-else>✅</q-btn>
               </div>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
+
 
   </div>
 </template>
@@ -134,10 +144,24 @@ function nuevo() {
   vaciar()
 }
 
+async function estado(chofer) {
+  console.log(chofer);
+
+  if (chofer.estado === 1) {
+    chofer.estado = 0
+  } else {
+    chofer.estado = 1
+  }
+  const res = await useConductor.actualizarEstado(chofer._id, chofer.estado)
+  console.log(res);
+  traer()
+}
+
 async function traer() {
   let res = await useConductor.traerConductor()
   console.log(res);
   data.value = res.data.chofer
+  data.value.reverse()
 }
 
 async function registrar() {
@@ -155,9 +179,8 @@ async function registrar() {
   vaciar()
 
   if (data) {
-    data.value.push(res.data.chofer);
+    data.value.unshift(res.data.chofer);
   }
-
   if (busquedaActiva.value) {
     const cedulaConduct = cc.value;
     encontrado.value = data.value.filter(item => item.cedula.includes(cedulaConduct));

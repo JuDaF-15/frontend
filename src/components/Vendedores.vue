@@ -39,6 +39,7 @@
                         <th>Nombre</th>
                         <th>Teléfono</th>
                         <th>Username</th>
+                        <th>Estado</th>
                         <th>Opciones</th>
                     </tr>
                 </thead>
@@ -48,11 +49,16 @@
                         <td>{{ empleado.nombre }}</td>
                         <td>{{ empleado.telefono }}</td>
                         <td>{{ empleado.username }}</td>
+                        <td :style="{ color: empleado.estado === 1 ? 'green' : 'red' }">{{ empleado.estado === 1 ? 'Activo' :
+                            'Inactivo'
+                        }}</td>
                         <td>
                             <div>
                                 <q-btn color="primary" style="margin-right: 5px;"
                                     @click="editarEmpleado(empleado)">✏️</q-btn>
-                                <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
+                                <q-btn color="primary" style="margin-left: 5px;" @click="estado(empleado)"
+                                    v-if="empleado.estado === 1">❌</q-btn>
+                                <q-btn color="primary" style="margin-left: 5px;" @click="estado(empleado)" v-else>✅</q-btn>
                             </div>
                         </td>
                     </tr>
@@ -68,6 +74,7 @@
                         <th>Nombre</th>
                         <th>Teléfono</th>
                         <th>Username</th>
+                        <th>Estado</th>
                         <th>Opciones</th>
                     </tr>
                 </thead>
@@ -77,11 +84,16 @@
                         <td>{{ empleado.nombre }}</td>
                         <td>{{ empleado.telefono }}</td>
                         <td>{{ empleado.username }}</td>
+                        <td :style="{ color: empleado.estado === 1 ? 'green' : 'red' }">{{ empleado.estado === 1 ? 'Activo' :
+                            'Inactivo'
+                        }}</td>
                         <td>
                             <div>
                                 <q-btn color="primary" style="margin-right: 5px;"
                                     @click="editarEmpleado(empleado)">✏️</q-btn>
-                                <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
+                                <q-btn color="primary" style="margin-left: 5px;" @click="estado(empleado)"
+                                    v-if="empleado.estado === 1">❌</q-btn>
+                                <q-btn color="primary" style="margin-left: 5px;" @click="estado(empleado)" v-else>✅</q-btn>
                             </div>
                         </td>
                     </tr>
@@ -121,6 +133,7 @@ async function traer() {
     let res = await useVendedor.traerVendedor()
     console.log(res);
     data.value = res.data.empleado
+    data.value.reverse()
 }
 
 async function registrar() {
@@ -135,13 +148,26 @@ async function registrar() {
     vaciar()
 
     if (data) {
-        data.value.push(res.data.empleado);
+        data.value.unshift(res.data.empleado);
     }
 
     if (busquedaActiva.value) {
         const cedulaEmple = cc.value;
         encontrado.value = data.value.filter(item => item.cedula.includes(cedulaEmple));
     }
+}
+
+async function estado(empleado) {
+    console.log(empleado);
+
+    if (empleado.estado === 1) {
+        empleado.estado = 0
+    } else {
+        empleado.estado = 1
+    }
+    const res = await useVendedor.actualizarEstado(empleado._id, empleado.estado)
+    console.log(res);
+    traer()
 }
 
 async function buscarCedula() {

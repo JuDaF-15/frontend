@@ -2,13 +2,13 @@
   <div>
 
     <div>
-      <q-btn label="Registrar Vehículo" color="primary" @click="alert = true" />
+      <q-btn label="Registrar Vehículo" color="primary" @click="alert = true; nuevo()" />
     </div><br><br>
 
     <q-dialog v-model="alert">
       <q-card style="width: 32%;">
         <q-card-section>
-          <div class="text-h6">Registrar Vehículo</div>
+          <div class="text-h6">{{ bd === 0 ? 'Editar Vehículo' : 'Registrar Vehículo' }}</div>
         </q-card-section>
 
         <q-card-section class="q-pt-none" style="overflow-x:hidden;">
@@ -25,7 +25,8 @@
           </div><br>
 
           <q-card-actions align="right">
-            <q-btn style="margin-top: -10px;" label="Guardar" color="primary" @click="registrar" />
+            <q-btn v-if="bd == 1" style="margin-top: -10px;" label="Guardar" color="primary" @click="registrar" />
+            <q-btn v-else style="margin-top: -10px;" label="Actualizar" color="primary" @click="actualizar" />
           </q-card-actions>
         </q-card-section>
       </q-card>
@@ -34,8 +35,6 @@
       <input type="text" placeholder="Matrícula" style="width: 20%;" v-model="mat">
       <q-btn label="Buscar" color="primary" @click="buscarMatricula" />
     </div><br>
-
-    <p>{{ c }}</p>
 
     <div class="tabla" v-if="!busquedaActiva">
       <table>
@@ -47,6 +46,7 @@
             <th>Marca</th>
             <th>Modelo</th>
             <th>Capacidad</th>
+            <th>Estado</th>
             <th>Opciones</th>
           </tr>
         </thead>
@@ -58,10 +58,16 @@
             <td>{{ vehiculo.marca }}</td>
             <td>{{ vehiculo.modelo }}</td>
             <td>{{ vehiculo.capacidad }}</td>
+            <td :style="{ color: vehiculo.estado === 1 ? 'green' : 'red' }">{{ vehiculo.estado === 1 ? 'Activo'
+              :
+              'Inactivo'
+            }}</td>
             <td>
               <div>
-                <q-btn color="primary" style="margin-right: 5px;">✏️</q-btn>
-                <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
+                <q-btn color="primary" style="margin-right: 5px;" @click="editarVehiculo(vehiculo)">✏️</q-btn>
+                <q-btn color="primary" style="margin-left: 5px;" @click="estado(vehiculo)"
+                  v-if="vehiculo.estado === 1">❌</q-btn>
+                <q-btn color="primary" style="margin-left: 5px;" @click="estado(vehiculo)" v-else>✅</q-btn>
               </div>
             </td>
           </tr>
@@ -79,6 +85,7 @@
             <th>Marca</th>
             <th>Modelo</th>
             <th>Capacidad</th>
+            <th>Estado</th>
             <th>Opciones</th>
           </tr>
         </thead>
@@ -90,10 +97,16 @@
             <td>{{ vehiculo.marca }}</td>
             <td>{{ vehiculo.modelo }}</td>
             <td>{{ vehiculo.capacidad }}</td>
+            <td :style="{ color: vehiculo.estado === 1 ? 'green' : 'red' }">{{ vehiculo.estado === 1 ? 'Activo'
+              :
+              'Inactivo'
+            }}</td>
             <td>
               <div>
-                <q-btn color="primary" style="margin-right: 5px;">✏️</q-btn>
-                <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
+                <q-btn color="primary" style="margin-right: 5px;" @click="editarVehiculo(vehiculo)">✏️</q-btn>
+                <q-btn color="primary" style="margin-left: 5px;" @click="estado(vehiculo)"
+                  v-if="vehiculo.estado === 1">❌</q-btn>
+                <q-btn color="primary" style="margin-left: 5px;" @click="estado(vehiculo)" v-else>✅</q-btn>
               </div>
             </td>
           </tr>
@@ -122,6 +135,8 @@ let capacidad = ref("")
 let conduc = ref([])
 let mat = ref("")
 let encontrado = ref("")
+let id = ref("")
+let bd = ref("")
 let busquedaActiva = ref(false)
 let data = ref([])
 let c = ref("")
@@ -131,6 +146,11 @@ onMounted(() => {
   traerConductores()
 })
 traer();
+
+function nuevo() {
+  bd.value = 1
+  vaciar()
+}
 
 async function traerConductores() {
   let res = await useConductor.traerConductor()
@@ -142,6 +162,7 @@ async function traer() {
   let res = await useVehiculo.traerVehiculo()
   console.log(res);
   data.value = res.data.vehiculo
+  data.value.reverse()
 }
 
 async function registrar() {
@@ -149,7 +170,7 @@ async function registrar() {
     matricula: matricula.value,
     chofer_id: c.value,
     tipo: tipo.value,
-    marca: modelo.value,
+    marca: marca.value,
     modelo: modelo.value,
     capacidad: capacidad.value
   })
@@ -158,15 +179,61 @@ async function registrar() {
 
   alert.value = false
   vaciar()
+  traer()
 
   if (data) {
-    data.value.push(res.data.vehiculo);
+    data.value.unshift(res.data.vehiculo);
   }
 
   if (busquedaActiva.value) {
     const matVeh = mat.value;
     encontrado.value = data.value.filter(item => item.matricula.includes(matVeh));
   }
+}
+
+async function estado(vehiculo) {
+  console.log(vehiculo);
+
+  if (vehiculo.estado === 1) {
+    vehiculo.estado = 0
+  } else {
+    vehiculo.estado = 1
+  }
+  const res = await useVehiculo.actualizarEstado(vehiculo._id, vehiculo.estado)
+  console.log(res);
+  traer()
+}
+
+function editarVehiculo(vehiculo) {
+  bd.value = 0
+  id.value = vehiculo._id
+  matricula.value = vehiculo.matricula
+  c.value = vehiculo.chofer_id.nombre
+  tipo.value = vehiculo.tipo
+  marca.value = vehiculo.marca
+  modelo.value = vehiculo.modelo
+  capacidad.value = vehiculo.capacidad
+
+  alert.value = true;
+  console.log(vehiculo);
+}
+
+async function actualizar() {
+  const res = await useVehiculo.actualizarVehiculo(id.value, matricula.value, c.value.nombre, tipo.value,
+    marca.value, modelo.value, capacidad.value)
+  console.log(res);
+
+  const indexActualizado = data.value.findIndex((vehiculos) => vehiculos._id === id.value);
+  if (indexActualizado !== -1) {
+    data.value[indexActualizado].matricula = matricula.value;
+    data.value[indexActualizado].chofer_id.nombre = c.value
+    data.value[indexActualizado].tipo = tipo.value
+    data.value[indexActualizado].marca = marca.value
+    data.value[indexActualizado].modelo = modelo.value
+    data.value[indexActualizado].capacidad = capacidad.value
+  }
+  alert.value = false
+  traer()
 }
 
 async function buscarMatricula() {
@@ -188,8 +255,6 @@ function vaciar() {
   modelo.value = ""
   capacidad.value = ""
 }
-
-console.log(data);
 
 </script>
   

@@ -46,10 +46,22 @@ export const useConductorStore = defineStore("chofer", () => {
     }
   };
 
+  const actualizarEstado = async (id,estado) => {
+    try{
+      let datos = await axios.patch(`http://localhost:4506/api/choferes/${id}`,
+      {estado:estado}
+      )
+      return datos
+    } catch (error){
+      console.log(error);
+    }
+  }
+
   return {
     traerConductor,
     registrarConductor,
     traerConductorCedula,
-    actualizarConductor
+    actualizarConductor,
+    actualizarEstado
   };
 });

@@ -37,6 +37,7 @@
                         <th>Cédula</th>
                         <th>Nombre</th>
                         <th>Teléfono</th>
+                        <th>Estado</th>
                         <th>Opciones</th>
                     </tr>
                 </thead>
@@ -45,12 +46,19 @@
                         <td>{{ cliente.cedula }}</td>
                         <td>{{ cliente.nombre }}</td>
                         <td>{{ cliente.telefono }}</td>
+                        <td :style="{ color: cliente.estado === 1 ? 'green' : 'red' }">{{ cliente.estado === 1 ? 'Activo'
+                            :
+                            'Inactivo'
+                        }}</td>
                         <td>
                             <div>
-                                <q-btn color="primary" @click="editarCliente(cliente)" style="margin-right: 5px;">✏️</q-btn>
-                                <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
+                                <q-btn color="primary" style="margin-right: 5px;" @click="editarCliente(cliente)">✏️</q-btn>
+                                <q-btn color="primary" style="margin-left: 5px;" @click="estado(cliente)"
+                                    v-if="cliente.estado === 1">❌</q-btn>
+                                <q-btn color="primary" style="margin-left: 5px;" @click="estado(cliente)" v-else>✅</q-btn>
                             </div>
                         </td>
+
                     </tr>
                 </tbody>
             </table>
@@ -63,6 +71,7 @@
                         <th>Cédula</th>
                         <th>Nombre</th>
                         <th>Teléfono</th>
+                        <th>Estado</th>
                         <th>Opciones</th>
                     </tr>
                 </thead>
@@ -71,10 +80,16 @@
                         <td>{{ cliente.cedula }}</td>
                         <td>{{ cliente.nombre }}</td>
                         <td>{{ cliente.telefono }}</td>
+                        <td :style="{ color: cliente.estado === 1 ? 'green' : 'red' }">{{ cliente.estado === 1 ? 'Activo'
+                            :
+                            'Inactivo'
+                        }}</td>
                         <td>
                             <div>
-                                <q-btn color="primary" @click="editarCliente(cliente)" style="margin-right: 5px;">✏️</q-btn>
-                                <q-btn color="primary" style="margin-left: 5px;">⛔</q-btn>
+                                <q-btn color="primary" style="margin-right: 5px;" @click="editarCliente(cliente)">✏️</q-btn>
+                                <q-btn color="primary" style="margin-left: 5px;" @click="estado(cliente)"
+                                    v-if="cliente.estado === 1">❌</q-btn>
+                                <q-btn color="primary" style="margin-left: 5px;" @click="estado(cliente)" v-else>✅</q-btn>
                             </div>
                         </td>
                     </tr>
@@ -112,6 +127,7 @@ async function traer() {
     let res = await useCliente.traerCliente()
     console.log(res);
     data.value = res.data.pasajero
+    data.value.reverse()
 }
 
 async function registrar() {
@@ -125,7 +141,7 @@ async function registrar() {
     vaciar()
 
     if (data) {
-        data.value.push(res.data.pasajero);
+        data.value.unshift(res.data.pasajero);
     }
 
     if (busquedaActiva.value) {
@@ -133,6 +149,19 @@ async function registrar() {
         encontrado.value = data.value.filter(item => item.cedula.includes(cedulaPasa));
     }
 
+}
+
+async function estado(cliente) {
+    console.log(cliente);
+
+    if (cliente.estado === 1) {
+        cliente.estado = 0
+    } else {
+        cliente.estado = 1
+    }
+    const res = await useCliente.actualizarEstado(cliente._id, cliente.estado)
+    console.log(res);
+    traer()
 }
 
 async function buscarCedula() {

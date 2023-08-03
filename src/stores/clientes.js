@@ -43,10 +43,22 @@ export const useClienteStore = defineStore("cliente", () => {
         }
     };
 
+    const actualizarEstado = async (id, estado) => {
+        try {
+            let datos = await axios.patch(`http://localhost:4506/api/pasajeros/${id}`,
+                { estado: estado }
+            )
+            return datos
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return {
         traerCliente,
         registrarCliente,
         traerPasajeroCedula,
-        actualizarCliente
+        actualizarCliente,
+        actualizarEstado
     }
 })

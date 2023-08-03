@@ -22,9 +22,6 @@
             </router-link>
           </div>
         </q-card>
-
-
-
       </div>
     </div>
   </template>
