@@ -219,7 +219,7 @@ function editarVehiculo(vehiculo) {
 }
 
 async function actualizar() {
-  const res = await useVehiculo.actualizarVehiculo(id.value, matricula.value, c.value.nombre, tipo.value,
+  const res = await useVehiculo.actualizarVehiculo(id.value, matricula.value, c.value, tipo.value,
     marca.value, modelo.value, capacidad.value)
   console.log(res);
 
