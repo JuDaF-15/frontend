@@ -103,7 +103,7 @@
         <q-img class="absolute-top" src="https://img.rawpixel.com/s3fs-private/rawpixel_images/website_content/v1016-c-08_1-ksh6mza3.jpg?w=800&dpr=1&fit=default&crop=default&q=65&vib=3&con=3&usm=15&bg=F4F4F3&ixlib=js-2.2.1&s=f584d8501c27c5f649bc2cfce50705c0" style="height: 150px">
           <div class="absolute-bottom bg-transparent">
             <q-avatar size="50px" style="margin-bottom: 10px;" color="orange">J</q-avatar>
-            <div class="text-weight-bold">Razvan Stoenescu</div>
+            <div class="text-weight-bold">Usuario</div>
             <div>Administrador</div>
           </div>
         </q-img>
