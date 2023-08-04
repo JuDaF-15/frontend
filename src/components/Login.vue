@@ -13,14 +13,14 @@
       <form id="admin-login-form">
         <p>
           <i class="input-icon fas fa-user"></i> Usuario
-          <input type="text" class="input-with-icon" v-model="user" />
+          <input type="text" class="input-with-icon" v-model="username" />
         </p>
         <p>
           <i class="input-icon fas fa-lock"></i> Contraseña
-          <input type="password" class="input-with-icon" v-model="contrasena" />
+          <input type="password" class="input-with-icon" v-model="clave" />
         </p>
         <p>
-          <button class="log" @click="validar()">Ingresar</button>
+          <button class="log" @click="iniciarSesion()">Ingresar</button>
         </p>
       </form>
     </div>
@@ -30,30 +30,28 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import axios from "axios";
+import { useLoginStore } from "../stores/login.js"
 
+let useLogin = useLoginStore()
 let router = useRouter();
-
-let usuario = ref({
-  username: "admin",
-  clave: "admin12345",
-});
-
-let user = ref("");
-let contrasena = ref("");
+let ruta = ref("")
+let username = ref("");
+let clave = ref("");
 let msj = ref("");
 
-function validar() {
-  if (user.value.trim() === "" || contrasena.value.trim() === "") {
-    msj.value = "Por favor, ingresa el usuario y la contraseña.";
-  } else if (user.value !== usuario.value.username || contrasena.value !== usuario.value.clave) {
-    msj.value = "Credenciales incorrectos";
-  } else {
-    router.push("/homeAdmin");
-  }
-  setTimeout(() => {
-    msj.value = "";
-  }, 2000);
+function iniciarSesion() {
+  useLogin.log(username.value, clave.value)
+    .then((res) => {
+      const token = res.data.token;
+      sessionStorage.setItem('token', token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      ruta.value = "/homeAdmin";
+      router.push(ruta.value);
+      console.log(token);
+    })
 }
+
 </script>
 
 <style scoped>
