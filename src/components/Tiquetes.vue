@@ -105,7 +105,6 @@ traerInfoRuta();
 
 async function traerVehiculo() {
     let res = await useVehiculo.traerVehiculo();
-    //console.log(res);
     vehiculo.value = res.data.vehiculo;
     console.log(vehiculo.value);
 }

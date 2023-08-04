@@ -2,7 +2,6 @@ import { defineStore } from "pinia"
 import axios from "axios"
 
 export const useClienteStore = defineStore("cliente", () => {
-    let data = ""
 
     const traerCliente = async (info) => {
         try {
@@ -53,7 +52,6 @@ export const useClienteStore = defineStore("cliente", () => {
             console.log(error);
         }
     }
-
     return {
         traerCliente,
         registrarCliente,
