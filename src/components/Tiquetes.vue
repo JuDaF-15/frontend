@@ -63,7 +63,9 @@
                 </div>
             </div>
             <div class="col">
-                aquí va el formulario
+                <div>Asiento seleccionado: {{ puesto }}</div>
+                <label>Cédula Cliente</label>
+                <input type="text">
             </div>
         </div>
     </div>
@@ -90,6 +92,8 @@ let fechaSalida = ref(new Date().toISOString().substr(0, 10));
 let horaSalida = ref("")
 let msj = ref("")
 let ok = ref(false)
+let mostrarVenta = ref(false)
+let datos = ref([])
 
 async function traerInfoRuta() {
     let res = await useRuta.traerRuta();
@@ -130,10 +134,11 @@ function validar() {
         msj.value = "";
     }, 2000);
 }
-
 function guardar() {
     if (validar() === true) {
         ok.value = true
+        datos.value.push(selectedRuta.value, selectedVehiculo.value, horaSalida.value, fechaSalida.value)
+        console.log(datos);
     }
 }
 
@@ -145,7 +150,6 @@ function venta(i) {
   
 <style scoped>
 #card {
-    border: 2px solid black;
     padding: 10px;
     margin: 0 auto;
     width: fit-content;

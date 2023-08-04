@@ -1,6 +1,11 @@
 <template>
   <div>
     <div class="container">
+      <div style="background-color: red; text-align: center;">
+        <span v-if="msj !== ''">
+          {{ msj }}
+        </span>
+      </div>
       <div class="avatar">
         <img src="avatar.png" alt="Avatar" />
       </div>
@@ -15,9 +20,7 @@
           <input type="password" class="input-with-icon" v-model="contrasena" />
         </p>
         <p>
-          <router-link to="/homeAdmin">
-            <button class="log" type="submit">Ingresar</button>
-          </router-link>
+          <button class="log" @click="validar()">Ingresar</button>
         </p>
       </form>
     </div>
@@ -25,29 +28,40 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue"
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+
+let router = useRouter();
 
 let usuario = ref({
   username: "admin",
-  clave: "admin12345"
-})
-
-let user = ref("")
-let contrasena = ref("")
-
-onMounted(() => {
-  user.value = usuario.value.username;
-  contrasena.value = usuario.value.clave;
+  clave: "admin12345",
 });
 
+let user = ref("");
+let contrasena = ref("");
+let msj = ref("");
+
+function validar() {
+  if (user.value.trim() === "" || contrasena.value.trim() === "") {
+    msj.value = "Por favor, ingresa el usuario y la contraseña.";
+  } else if (user.value !== usuario.value.username || contrasena.value !== usuario.value.clave) {
+    msj.value = "Credenciales incorrectos";
+  } else {
+    router.push("/homeAdmin");
+  }
+  setTimeout(() => {
+    msj.value = "";
+  }, 2000);
+}
 </script>
 
 <style scoped>
 .container {
-  width: 400px;
-  max-height: fit-content;
-  margin: 40px auto;
-  padding: 12px;
+  width: 380px;
+  height: auto;
+  margin: 20px auto;
+  padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
   background-color: #f7f7f7;
@@ -75,6 +89,7 @@ h2 {
 
 input {
   width: 100%;
+  height: 35px;
   padding: 10px;
   margin-bottom: 10px;
   border: 1px solid #ccc;
