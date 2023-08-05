@@ -6,7 +6,7 @@ export const useClienteStore = defineStore("cliente", () => {
     const traerCliente = async (info) => {
         try {
             let datos = await axios.get("http://localhost:4506/api/pasajeros", info)
-            return datos
+            return datos //return
         } catch (error) {
             console.log(error);
         }
