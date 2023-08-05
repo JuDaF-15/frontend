@@ -49,23 +49,31 @@
             </q-card>
         </q-dialog>
 
-        <div class="row" v-if="ok === true">
-            <div class="col">
-                <div class="card-centrada">
-                    <q-card class="q-pt-none q-glutter-md q-col-glutter-md" id="card">
-                        <div class="img-wrapper">
-                            <div class="img-container" v-for="i in selectedVehiculo.capacidad" :key="i">
-                                <span class="seat-number">{{ i }}</span>
-                                <img class="asiento" src="asiento.png" @click="venta(i)" />
-                            </div>
+        <div class="q-pa-md row items-start q-gutter-md" v-if="ok === true">
+            <div class="card-centrada">
+                <q-card class="q-pt-none q-glutter-md q-col-glutter-md" id="card">
+                    <div class="img-wrapper">
+                        <div class="img-container" v-for="i in selectedVehiculo.capacidad" :key="i">
+                            <span class="seat-number">{{ i }}</span>
+                            <img class="asiento" src="asiento.png" @click="venta(i)" />
                         </div>
-                    </q-card>
-                </div>
+                    </div>
+                </q-card>
             </div>
-            <div class="col">
-                <div>Asiento seleccionado: {{ puesto }}</div>
+            <div class="col" v-if="mostrarVenta">
+                <p style="font-weight: bold;font-size: larger;">Asiento # {{ puesto }}</p>
                 <label>Cédula Cliente</label>
-                <input type="text">
+                <input type="text" v-model="cedula">
+
+                <label>Teléfono</label>
+                <input type="text" v-model="telefono">
+
+                <label>Nombre</label>
+                <input type="text" v-model="nombre">
+
+                <div style="margin-top: 10px;">
+                    <q-btn color="primary" style="width: 100%;" @click="confirmar(); buscarCliente()">Confirmar</q-btn>
+                </div>
             </div>
         </div>
     </div>
@@ -86,7 +94,7 @@ let selectedVehiculo = ref("");
 let alert = ref(false);
 let ruta = ref("");
 let vehiculo = ref("");
-let cliente = ref("")
+//let cliente = ref("")
 let puesto = ref();
 let fechaSalida = ref(new Date().toISOString().substr(0, 10));
 let horaSalida = ref("")
@@ -94,6 +102,10 @@ let msj = ref("")
 let ok = ref(false)
 let mostrarVenta = ref(false)
 let datos = ref([])
+
+let cedula = ref("")
+let telefono = ref("")
+let nombre = ref("")
 
 async function traerInfoRuta() {
     let res = await useRuta.traerRuta();
@@ -111,12 +123,12 @@ async function traerVehiculo() {
 
 traerVehiculo();
 
-async function traerCliente() {
-    let res = await useCliente.traerCliente()
-    cliente.value = res.data.pasajero
-    console.log(cliente.value);
+async function buscarCliente() {
+    let res = await useCliente.traerPasajeroCedula(cedula.value)
+    console.log(res.data);
+    telefono.value = res.data.telefono
+    nombre.value = res.data.nombre
 }
-traerCliente()
 
 function validar() {
     if (!selectedVehiculo.value) {
@@ -136,14 +148,26 @@ function validar() {
 function guardar() {
     if (validar() === true) {
         ok.value = true
-        datos.value.push(selectedRuta.value, selectedVehiculo.value, horaSalida.value, fechaSalida.value)
-        console.log(datos);
     }
 }
 
 function venta(i) {
     puesto.value = i;
-    console.log(puesto.value);
+    mostrarVenta.value = true
+}
+
+function confirmar() {
+    datos.value.push({
+        ruta: selectedRuta.value,
+        vehiculo: selectedVehiculo.value,
+        horaSalida: horaSalida.value,
+        fechaSalida: fechaSalida.value,
+        cedula: cedula.value,
+        puesto: puesto.value,
+        nombre: nombre.value,
+        telefono:telefono.value
+    })
+    console.log(datos);
 }
 </script>
   
@@ -244,4 +268,3 @@ input:focus {
     border-color: #2b7ce6;
 }
 </style>
-  
