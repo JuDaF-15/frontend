@@ -29,7 +29,7 @@ export const useVendedorStore = defineStore("vendedor", () => {
             let datos = await axios.post("http://localhost:4506/api/empleados", info)
             return datos
         } catch (error) {
-            console.log(error);
+            throw error
         }
     }
 
@@ -40,7 +40,7 @@ export const useVendedorStore = defineStore("vendedor", () => {
             });
             return datos;
         } catch (error) {
-            console.log(error);
+            throw error
         }
     };
     const actualizarEstado = async (id, estado) => {

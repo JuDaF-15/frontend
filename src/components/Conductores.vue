@@ -3,6 +3,8 @@
 
     <div>
       <q-btn label="Registrar Conductor" color="primary" @click="alert = true; nuevo()" />
+      <input type="text" placeholder="Cédula" style="width: 20%;margin-left: 52%;" v-model="cc">
+      <q-btn label="Buscar" color="primary" @click="buscarCedula" />
     </div><br><br>
 
     <q-dialog v-model="alert">
@@ -13,10 +15,11 @@
 
         <q-card-section class="q-pt-none">
           <div>
-            <q-input outlined label="Cédula" v-model="cedula" />
+            <q-input outlined label="Cédula" type="number" v-model="cedula" />
             <q-input style="margin-top: 10px;" outlined label="Nombre" v-model="nombre" />
-            <q-input style="margin-top: 10px;" outlined label="Teléfono" v-model="telefono" />
-            <q-input style="margin-top: 10px;" outlined label="Número de Licencia" v-model="numero_licencia" />
+            <q-input style="margin-top: 10px;" type="number" outlined label="Teléfono" v-model="telefono" />
+            <q-input style="margin-top: 10px;" type="number" outlined label="Número de Licencia"
+              v-model="numero_licencia" />
             <q-input style="margin-top: 10px;" outlined label="Categoría Licencia" v-model="categoria_licencia" />
             <q-input style="margin-top: 10px;" outlined label="Fecha de Vencimiento" v-model="fecha_vencimiento"
               type="date" />
@@ -24,16 +27,13 @@
           </div><br>
 
           <q-card-actions align="right">
-            <q-btn v-if="bd == 1" style="margin-top: -10px;" label="Guardar" color="primary" @click="registrar" />
-            <q-btn v-else style="margin-top: -10px;" label="Actualizar" color="primary" @click="actualizar" />
+            <q-btn v-if="bd == 1" style="margin-top: -10px;" label="Guardar" color="primary" @click="registrar()" />
+            <q-btn v-else style="margin-top: -10px;" label="Actualizar" color="primary" @click="actualizar()" />
           </q-card-actions>
         </q-card-section>
       </q-card>
     </q-dialog>
-    <div>
-      <input type="text" placeholder="Cédula" style="width: 20%;" v-model="cc">
-      <q-btn label="Buscar" color="primary" @click="buscarCedula" />
-    </div><br>
+
     <div class="tabla" v-if="!busquedaActiva">
       <table>
         <thead>
@@ -119,6 +119,7 @@
 <script setup>
 import { useConductorStore } from "../stores/conductores.js"
 import { ref } from "vue"
+import { useQuasar } from "quasar"
 
 const useConductor = useConductorStore()
 let cedula = ref("")
@@ -129,7 +130,9 @@ let categoria_licencia = ref("")
 let fecha_vencimiento = ref("")
 let experiencia = ref("")
 
+const $q = useQuasar()
 let data = ref([])
+let errores = ref([])
 let cc = ref("")
 let id = ref("")
 let bd = ref("")
@@ -164,6 +167,29 @@ async function traer() {
   data.value.reverse()
 }
 
+function validarVacios() {
+  if (cedula.value === "" && nombre.value === "" && telefono.value === "" && categoria_licencia.value === ""
+    && numero_licencia.value === "" && fecha_vencimiento.value === "" && experiencia.value === "") {
+    $q.notify({
+      message: 'Campos vacíos',
+      color: 'red',
+      icon: 'warning',
+      position: 'top',
+      timeout: Math.random() * 3000
+    })
+  } else return true
+}
+
+function validar() {
+  $q.notify({
+    message: errores,
+    color: 'red',
+    position: 'top',
+    icon: 'warning',
+    timeout: Math.random() * 3000
+  })
+}
+
 async function registrar() {
   let res = await useConductor.registrarConductor({
     cedula: cedula.value,
@@ -173,19 +199,35 @@ async function registrar() {
     categoria_licencia: categoria_licencia.value,
     fecha_vencimiento: fecha_vencimiento.value,
     experiencia: experiencia.value
-  })
+  }).then((res) => {
+    alert.value = false
+    vaciar()
 
-  alert.value = false
-  vaciar()
+    $q.notify({
+      message: 'Conductor agregado exitosamente',
+      color: 'green',
+      position: 'top',
+      icon: 'check',
+      timeout: Math.random() * 3000
+    })
 
-  if (data) {
-    data.value.unshift(res.data.chofer);
-  }
+    if (data) {
+      data.value.unshift(res.data.chofer);
+    }
+  }).catch((error) => {
+    if (error.response && error.response.data && validarVacios() === true) {
+      errores.value = error.response.data.errors[0].msg
+      validar()
+
+    } else {
+      console.log(error);
+    }
+  });
+
   if (busquedaActiva.value) {
     const cedulaConduct = cc.value;
     encontrado.value = data.value.filter(item => item.cedula.includes(cedulaConduct));
   }
-
 }
 
 async function buscarCedula() {
@@ -226,20 +268,38 @@ function editarChofer(chofer) {
 async function actualizar() {
   const res = await useConductor.actualizarConductor(id.value, cedula.value, nombre.value, telefono.value,
     numero_licencia.value, categoria_licencia.value, fecha_vencimiento.value, experiencia.value)
-  console.log(res);
+    .then((res) => {
+      alert.value = false
 
-  const indexActualizado = data.value.findIndex((conductor) => conductor._id === id.value);
-  if (indexActualizado !== -1) {
-    data.value[indexActualizado].cedula = cedula.value;
-    data.value[indexActualizado].nombre = nombre.value;
-    data.value[indexActualizado].telefono = telefono.value;
-    data.value[indexActualizado].numero_licencia = numero_licencia.value;
-    data.value[indexActualizado].categoria_licencia = categoria_licencia.value;
-    data.value[indexActualizado].fecha_vencimiento = fecha_vencimiento.value;
-    data.value[indexActualizado].experiencia = experiencia.value;
-  }
-  alert.value = false
-  traer()
+      const indexActualizado = data.value.findIndex((conductor) => conductor._id === id.value);
+      if (indexActualizado !== -1) {
+        data.value[indexActualizado].cedula = cedula.value;
+        data.value[indexActualizado].nombre = nombre.value;
+        data.value[indexActualizado].telefono = telefono.value;
+        data.value[indexActualizado].numero_licencia = numero_licencia.value;
+        data.value[indexActualizado].categoria_licencia = categoria_licencia.value;
+        data.value[indexActualizado].fecha_vencimiento = fecha_vencimiento.value;
+        data.value[indexActualizado].experiencia = experiencia.value;
+      }
+      $q.notify({
+        message: 'Conductor editado exitosamente',
+        color: 'green',
+        position: 'top',
+        icon: 'check',
+        timeout: Math.random() * 3000
+      })
+      traer()
+    }).catch((error) => {
+      errores.value = ''
+      if (error.response && error.response.data && validarVacios() === true) {
+        errores.value = error.response.data.errors[0].msg
+        validar()
+
+      } else {
+        console.log(error);
+      }
+    })
+
 }
 
 </script>
@@ -250,6 +310,7 @@ input {
   padding: 10px;
   border: 1px solid #ccc;
   margin-bottom: 10px;
+  border-radius: 5px;
 }
 
 .tabla {
@@ -277,7 +338,12 @@ thead {
   z-index: 1;
 }
 
-tbody tr:nth-child(even) {
-  background-color: #f2f2f2;
+tbody tr:hover{
+  background-color: #1511e018;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
 }
+
+
 </style>

@@ -2,7 +2,10 @@
     <div>
         <div>
             <q-btn label="Registrar Cliente" color="primary" @click="nuevo(); alert = true" />
+            <input type="text" placeholder="Cédula" style="width: 20%;margin-left: 56%;" v-model="cc">
+            <q-btn label="Buscar" color="primary" @click="buscarCedula" />
         </div><br><br>
+        
         <q-dialog v-model="alert">
             <q-card style="width: 32%;">
                 <q-card-section>
@@ -11,7 +14,7 @@
 
                 <q-card-section class="q-pt-none">
                     <div>
-                        <q-input outlined label="Cédula" v-model="cedula" />
+                        <q-input outlined label="Cédula" type="number" v-model="cedula" />
                         <q-input style="margin-top: 10px;" outlined label="Nombre" v-model="nombre" />
                         <q-input style="margin-top: 10px;" outlined label="Teléfono" v-model="telefono" />
                     </div><br>
@@ -24,11 +27,6 @@
                 </q-card-section>
             </q-card>
         </q-dialog>
-
-        <div>
-            <input type="text" placeholder="Cédula" style="width: 20%;" v-model="cc">
-            <q-btn label="Buscar" color="primary" @click="buscarCedula" />
-        </div><br>
 
         <div class="tabla" v-if="!busquedaActiva">
             <table>
@@ -204,7 +202,6 @@ function vaciar() {
     telefono.value = ""
 }
 
-
 </script>
   
 <style scoped>
@@ -212,7 +209,8 @@ input {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
-    margin-bottom: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px
 }
 
 .tabla {
@@ -240,7 +238,10 @@ thead {
     z-index: 1;
 }
 
-tbody tr:nth-child(even) {
-    background-color: #f2f2f2;
+tbody tr:hover{
+  background-color: #1511e018;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
 }
 </style>

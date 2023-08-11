@@ -1,8 +1,9 @@
 <template>
   <div>
-
     <div>
       <q-btn label="Registrar Vehículo" color="primary" @click="alert = true; nuevo()" />
+      <input type="text" placeholder="Matrícula" style="width: 20%;margin-left: 57%;" v-model="mat">
+      <q-btn label="Buscar" color="primary" @click="buscarMatricula" />
     </div><br><br>
 
     <q-dialog v-model="alert">
@@ -31,10 +32,6 @@
         </q-card-section>
       </q-card>
     </q-dialog>
-    <div>
-      <input type="text" placeholder="Matrícula" style="width: 20%;" v-model="mat">
-      <q-btn label="Buscar" color="primary" @click="buscarMatricula" />
-    </div><br>
 
     <div class="tabla" v-if="!busquedaActiva">
       <table>
@@ -264,6 +261,7 @@ input {
   padding: 10px;
   border: 1px solid #ccc;
   margin-bottom: 10px;
+  border-radius: 5px;
 }
 
 button {
@@ -298,8 +296,11 @@ td {
   padding: 8px;
 }
 
-tbody tr:nth-child(even) {
-  background-color: #f2f2f2;
+tbody tr:hover{
+  background-color: #1511e018;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
 }
 </style>
   

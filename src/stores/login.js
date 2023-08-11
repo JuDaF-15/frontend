@@ -1,17 +1,25 @@
 import { defineStore } from "pinia";
 import axios from "axios";
+import { ref } from "vue"
 
 export const useLoginStore = defineStore("login", () => {
-  const log = async (usuario, clave) => {
+  let loading = ref(false)
+  let usuario = ref("")
+
+  const logi = async (usuario, clave) => {
     try {
+      loading.value = true
       let datos = await axios.post("http://localhost:4506/api/logins/login",
         { usuario: usuario, clave: clave });
       return datos;
     } catch (error) {
-      console.log(error);
+      loading.value = true
+      throw error
+    } finally {
+      loading.value = false
     }
   };
   return {
-    log
+    logi
   };
 });

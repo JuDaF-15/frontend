@@ -22,7 +22,7 @@
                         <label>Ruta:</label>
                         <select v-model="selectedRuta" id="rutaSelect">
                             <option v-for="option in ruta" :value="option" :key="option.id">
-                                {{ option.nombre }}
+                                {{ option.nombre }} / Hora: {{ option.hora_salida }}
                             </option>
                         </select>
 
@@ -34,10 +34,7 @@
                         </select>
 
                         <label>Fecha De Salida:</label>
-                        <input type="date" v-model="fechaSalida" :disabled="true">
-
-                        <label>Hora de Salida:</label>
-                        <input type="time" v-model="horaSalida">
+                        <input type="date" v-model="fechaSalida">
 
                     </div>
                     <br />
@@ -65,14 +62,14 @@
                 <label>Cédula Cliente</label>
                 <input type="text" v-model="cedula">
 
-                <label>Teléfono</label>
+                <!-- <label>Teléfono</label>
                 <input type="text" v-model="telefono">
 
                 <label>Nombre</label>
-                <input type="text" v-model="nombre">
+                <input type="text" v-model="nombre"> -->
 
                 <div style="margin-top: 10px;">
-                    <q-btn color="primary" style="width: 100%;" @click="confirmar(); buscarCliente()">Confirmar</q-btn>
+                    <q-btn color="primary" style="width: 100%;" @click="guardarTiquete();buscarCliente()">Confirmar</q-btn>
                 </div>
             </div>
         </div>
@@ -84,25 +81,24 @@ import { ref } from "vue";
 import { useVehiculoStore } from "../stores/vehiculos.js";
 import { useRutaStore } from "../stores/rutas.js";
 import { useClienteStore } from "../stores/clientes.js";
+import { useTiqueteStore } from "../stores/tiquetes.js"
 
 const useVehiculo = useVehiculoStore();
 const useRuta = useRutaStore();
 const useCliente = useClienteStore();
+const useTiquetes = useTiqueteStore()
 let selectedRuta = ref("");
 let selectedVehiculo = ref("");
 
 let alert = ref(false);
 let ruta = ref("");
 let vehiculo = ref("");
-//let cliente = ref("")
 let puesto = ref();
 let fechaSalida = ref(new Date().toISOString().substr(0, 10));
-let horaSalida = ref("")
 let msj = ref("")
 let ok = ref(false)
 let mostrarVenta = ref(false)
-let datos = ref([])
-
+let idCliente = ref("")
 let cedula = ref("")
 let telefono = ref("")
 let nombre = ref("")
@@ -126,8 +122,26 @@ traerVehiculo();
 async function buscarCliente() {
     let res = await useCliente.traerPasajeroCedula(cedula.value)
     console.log(res.data);
-    telefono.value = res.data.telefono
-    nombre.value = res.data.nombre
+    idCliente.value = res.data._id
+    console.log(idCliente);
+    /* telefono.value = res.data.telefono
+    nombre.value = res.data.nombre */
+}
+
+/* numero, vehiculo_matricula, empleado, cedula_pasajero, num_acientos, fecha_salida, hora_salida, tipo_pago, ruta, estado */
+
+async function guardarTiquete() {
+    let r = await useTiquetes.postTiquete({
+        numero: "101010101",
+        vehiculo_matricula: selectedVehiculo.value._id,
+        empleado: "64cc0467ca96b9c2e8cb2044",
+        cedula_pasajero: idCliente.value,
+        num_acientos: puesto.value,
+        fecha_salida: fechaSalida.value,
+        tipo_pago: "Efectivo",
+        ruta: selectedRuta.value._id
+    })
+    console.log(r);
 }
 
 function validar() {
@@ -135,8 +149,8 @@ function validar() {
         msj.value = "Seleccione el vehiculo"
     } else if (!selectedRuta.value) {
         msj.value = "Seleccione la ruta"
-    } else if (!horaSalida.value) {
-        msj.value = "Selecciona la hora"
+    } else if (!fechaSalida.value) {
+        msj.value = "Selecciona la fecha"
     } else {
         alert.value = false
         return true
@@ -156,19 +170,7 @@ function venta(i) {
     mostrarVenta.value = true
 }
 
-function confirmar() {
-    datos.value.push({
-        ruta: selectedRuta.value,
-        vehiculo: selectedVehiculo.value,
-        horaSalida: horaSalida.value,
-        fechaSalida: fechaSalida.value,
-        cedula: cedula.value,
-        puesto: puesto.value,
-        nombre: nombre.value,
-        telefono:telefono.value
-    })
-    console.log(datos);
-}
+
 </script>
   
 <style scoped>

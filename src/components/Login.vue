@@ -1,11 +1,6 @@
 <template>
   <div>
     <div class="container">
-      <div style="background-color: red; text-align: center;">
-        <span v-if="msj !== ''">
-          {{ msj }}
-        </span>
-      </div>
       <div class="avatar">
         <img src="avatar.png" alt="Avatar" />
       </div>
@@ -32,16 +27,29 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import { useLoginStore } from "../stores/login.js"
+import { useQuasar } from 'quasar'
 
 let useLogin = useLoginStore()
 let router = useRouter();
 let ruta = ref("")
 let username = ref("");
 let clave = ref("");
-let msj = ref("");
+const $q = useQuasar()
 
-function iniciarSesion() {
-  useLogin.log(username.value, clave.value)
+function validar() {
+  if (username.value === "" && clave.value === "") {
+    $q.notify({
+      message: 'Campos vacíos',
+      color: 'red',
+      icon: 'warning',
+      position: 'top',
+      timeout: Math.random() * 3000
+    })
+  } else return true
+}
+
+async function iniciarSesion() {
+  useLogin.logi(username.value, clave.value)
     .then((res) => {
       const token = res.data.token;
       sessionStorage.setItem('token', token);
@@ -49,8 +57,35 @@ function iniciarSesion() {
       ruta.value = "/homeAdmin";
       router.push(ruta.value);
       console.log(token);
+    }).catch((error) => {
+      if (error.response && error.response.data.errors && validar() === true) {
+
+        const camposVacios = error.response.data.errors[0].msg
+
+        $q.notify({
+          message: camposVacios,
+          color: 'red',
+          icon: 'warning',
+          position: 'top',
+          timeout: Math.random() * 3000
+        })
+      } else if (error.response && error.response.data.mensaje) {
+        const credencialesInvalidas = error.response.data.mensaje
+
+        $q.notify({
+          message: credencialesInvalidas,
+          color: 'red',
+          position: 'top',
+          icon: 'warning',
+          timeout: Math.random() * 3000
+        })
+
+      } else {
+        console.log(error);
+      }
     })
 }
+
 
 </script>
 

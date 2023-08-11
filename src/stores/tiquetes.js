@@ -13,7 +13,16 @@ export const useTiqueteStore = defineStore("tiquete", () => {
         }
     }
 
+    const postTiquete = async (info) => {
+        try {
+            let datos = await axios.post("http://localhost:4506/api/tiketes", info)
+            return datos
+        } catch (error) {
+            return error
+        }
+    }
+
     return {
-        traerTiquete
+        traerTiquete, postTiquete
     }
 })
