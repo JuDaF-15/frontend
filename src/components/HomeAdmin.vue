@@ -8,7 +8,7 @@
           </q-card-section>
           <div style="display: flex; justify-content: center;">
             <router-link to="/conductores">
-              <img src="licencia-de-conducir.png" style="width: 100px; height: 100px;">
+              <img src="imagenes/licencia-de-conducir.png" style="width: 100px; height: 100px;">
             </router-link>
           </div>
         </q-card>
@@ -19,7 +19,7 @@
           </q-card-section>
           <div style="display: flex; justify-content: center;">
             <router-link to="/vendedores">
-              <img src="vendedora.png" style="width: 100px; height: 100px;">
+              <img src="imagenes/vendedora.png" style="width: 100px; height: 100px;">
             </router-link>
           </div>
         </q-card>
@@ -30,7 +30,7 @@
           </q-card-section>
           <div style="display: flex; justify-content: center;">
             <router-link to="/vehiculos">
-              <img src="autobus.png" style="width: 100px; height: 100px;">
+              <img src="imagenes/autobus.png" style="width: 100px; height: 100px;">
             </router-link>
           </div>
         </q-card>
@@ -41,7 +41,7 @@
           </q-card-section>
           <div style="display: flex; justify-content: center;">
             <router-link to="/rutas">
-              <img src="ruta.png" style="width: 100px; height: 100px;">
+              <img src="imagenes/ruta.png" style="width: 100px; height: 100px;">
             </router-link>
           </div>
         </q-card>
@@ -52,7 +52,7 @@
           </q-card-section>
           <div style="display: flex; justify-content: center;">
             <router-link to="/clientes">
-              <img src="clientes.png" style="width: 100px; height: 100px;">
+              <img src="imagenes/clientes.png" style="width: 100px; height: 100px;">
             </router-link>
           </div>
         </q-card>
@@ -63,7 +63,7 @@
           </q-card-section>
           <div style="display: flex; justify-content: center;">
             <router-link to="/tiquetes">
-              <img src="factura.png" style="width: 100px; height: 100px;">
+              <img src="imagenes/factura.png" style="width: 100px; height: 100px;">
             </router-link>
           </div>
         </q-card>

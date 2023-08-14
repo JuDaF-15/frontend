@@ -52,7 +52,7 @@
                     <div class="img-wrapper">
                         <div class="img-container" v-for="i in selectedVehiculo.capacidad" :key="i">
                             <span class="seat-number">{{ i }}</span>
-                            <img class="asiento" src="asiento.png" @click="venta(i)" />
+                            <img class="asiento" src="imagenes/asiento.png" @click="venta(i)" />
                         </div>
                     </div>
                 </q-card>

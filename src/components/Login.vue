@@ -2,7 +2,7 @@
   <div>
     <div class="container">
       <div class="avatar">
-        <img src="avatar.png" alt="Avatar" />
+        <img src="imagenes/avatar.png" alt="Avatar" />
       </div>
       <h3>Login</h3>
       <form id="admin-login-form">
