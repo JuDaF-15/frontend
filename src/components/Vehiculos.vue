@@ -1,9 +1,14 @@
 <template>
   <div>
-    <div>
-      <q-btn label="Registrar Vehículo" color="primary" @click="alert = true; nuevo()" />
-      <input type="text" placeholder="Matrícula" style="width: 20%;margin-left: 57%;" v-model="mat">
-      <q-btn label="Buscar" color="primary" @click="buscarMatricula" />
+    <div class="row">
+      <div class="col">
+        <q-btn label="Registrar Vehículo" icon="add" color="primary" @click="alert = true; nuevo()" />
+      </div>
+      <div class="col" style="display: flex;justify-content: flex-end;align-items:center ;">
+        <div @click="limpiarBusqueda" style="cursor: pointer;">🗑️</div>
+        <input type="text" placeholder="Matrícula" v-model="mat">
+        <q-btn label="Buscar" icon="search" color="primary" @click="buscarMatricula" />
+      </div>
     </div><br><br>
 
     <q-dialog v-model="alert">
@@ -32,6 +37,10 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <div class="spinner-container" v-if="useVehiculo.loading == true">
+      <q-spinner style="margin-left: 10px;" color="black" size="5em" :thickness="10" />
+    </div>
 
     <div class="tabla" v-if="!busquedaActiva">
       <table>
@@ -118,7 +127,9 @@
 <script setup>
 import { useVehiculoStore } from "../stores/vehiculos.js"
 import { useConductorStore } from "../stores/conductores";
-import { onMounted, ref } from "vue"
+import { ref } from "vue"
+import { useQuasar } from 'quasar'
+
 
 const useVehiculo = useVehiculoStore()
 const useConductor = useConductorStore()
@@ -129,6 +140,7 @@ let marca = ref("")
 let modelo = ref("")
 let capacidad = ref("")
 
+const $q = useQuasar()
 let conduc = ref([])
 let mat = ref("")
 let encontrado = ref("")
@@ -136,13 +148,13 @@ let id = ref("")
 let bd = ref("")
 let busquedaActiva = ref(false)
 let data = ref([])
+let errores = ref([])
 let c = ref("")
 let alert = ref(false)
 
-onMounted(() => {
-  traerConductores()
-})
+traerConductores()
 traer();
+
 
 function nuevo() {
   bd.value = 1
@@ -162,6 +174,29 @@ async function traer() {
   data.value.reverse()
 }
 
+function validarVacios() {
+  if (matricula.value === "" && c.value === "" && tipo.value === "" && marca.value === "" && modelo.value === ""
+    && capacidad.value === "") {
+    $q.notify({
+      message: 'Campos vacíos',
+      color: 'red',
+      icon: 'warning',
+      position: 'top',
+      timeout: Math.random() * 3000
+    })
+  } else return true
+}
+
+function validar() {
+  $q.notify({
+    message: errores,
+    color: 'red',
+    position: 'top',
+    icon: 'warning',
+    timeout: Math.random() * 3000
+  })
+}
+
 async function registrar() {
   let res = await useVehiculo.registrarVehiculo({
     matricula: matricula.value,
@@ -170,18 +205,32 @@ async function registrar() {
     marca: marca.value,
     modelo: modelo.value,
     capacidad: capacidad.value
-  })
+  }).then((res) => {
+    alert.value = false
+    vaciar()
+    traer()
 
-  console.log(res);
+    if (data) {
+      data.value.unshift(res.data.vehiculo);
+    }
 
-  alert.value = false
-  vaciar()
-  traer()
+    $q.notify({
+      message: 'Vehículo agregado exitosamente',
+      color: 'green',
+      position: 'top',
+      icon: 'check',
+      timeout: Math.random() * 3000
+    })
 
-  if (data) {
-    data.value.unshift(res.data.vehiculo);
-  }
+  }).catch((error) => {
+    if (error.response && error.response.data && validarVacios() === true) {
+      errores.value = error.response.data.errors[0].msg
+      validar()
 
+    } else {
+      console.log(error);
+    }
+  });
   if (busquedaActiva.value) {
     const matVeh = mat.value;
     encontrado.value = data.value.filter(item => item.matricula.includes(matVeh));
@@ -200,48 +249,92 @@ async function estado(vehiculo) {
   console.log(res);
   traer()
 }
+function limpiarBusqueda() {
+  mat.value = ""
+  busquedaActiva.value = false
+}
+
+async function buscarMatricula() {
+
+  if (mat.value.trim() == "") {
+    $q.notify({
+      message: 'Introduzca la matrícula a buscar',
+      color: 'red',
+      position: 'top',
+      icon: 'warning',
+      timeout: Math.random() * 3000
+    })
+  } else {
+    const matVeh = mat.value.trim()
+    let res = await useVehiculo.traerVehiculoMatricula(matVeh)
+
+    encontrado.value = data.value.filter((item) =>
+      item.matricula.includes(matVeh)
+    )
+    busquedaActiva.value = true
+    return res
+  }
+
+}
 
 function editarVehiculo(vehiculo) {
   bd.value = 0
   id.value = vehiculo._id
   matricula.value = vehiculo.matricula
-  c.value = vehiculo.chofer_id.nombre
+  c.value = vehiculo.chofer_id._id
   tipo.value = vehiculo.tipo
   marca.value = vehiculo.marca
   modelo.value = vehiculo.modelo
   capacidad.value = vehiculo.capacidad
 
   alert.value = true;
-  console.log(vehiculo);
 }
 
 async function actualizar() {
   const res = await useVehiculo.actualizarVehiculo(id.value, matricula.value, c.value, tipo.value,
     marca.value, modelo.value, capacidad.value)
-  console.log(res);
+    .then((res) => {
+      console.log(res);
+      alert.value = false
+      traer()
 
-  const indexActualizado = data.value.findIndex((vehiculos) => vehiculos._id === id.value);
-  if (indexActualizado !== -1) {
-    data.value[indexActualizado].matricula = matricula.value;
-    data.value[indexActualizado].chofer_id.nombre = c.value
-    data.value[indexActualizado].tipo = tipo.value
-    data.value[indexActualizado].marca = marca.value
-    data.value[indexActualizado].modelo = modelo.value
-    data.value[indexActualizado].capacidad = capacidad.value
-  }
-  alert.value = false
-  traer()
-}
+      const indexActualizado = data.value.findIndex((vehiculos) => vehiculos._id === id.value);
+      if (indexActualizado !== -1) {
+        data.value[indexActualizado].matricula = matricula.value;
+        data.value[indexActualizado].chofer_id._id = c.value
+        data.value[indexActualizado].tipo = tipo.value
+        data.value[indexActualizado].marca = marca.value
+        data.value[indexActualizado].modelo = modelo.value
+        data.value[indexActualizado].capacidad = capacidad.value
+      }
+      $q.notify({
+        message: 'Vehículo editado exitosamente',
+        color: 'green',
+        position: 'top',
+        icon: 'check',
+        timeout: Math.random() * 3000
+      })
 
-async function buscarMatricula() {
-  const matVeh = mat.value.trim()
-  let res = await useVehiculo.traerVehiculoMatricula(matVeh)
+      const indexActualizadoEncontrado = encontrado.value.findIndex((vehiculos) => vehiculos._id === id.value);
+      if (indexActualizadoEncontrado !== -1) {
+        encontrado.value[indexActualizadoEncontrado].matricula = matricula.value;
+        encontrado.value[indexActualizadoEncontrado].chofer_id._id = c.value
+        encontrado.value[indexActualizadoEncontrado].tipo = tipo.value
+        encontrado.value[indexActualizadoEncontrado].marca = marca.value
+        encontrado.value[indexActualizadoEncontrado].modelo = modelo.value
+        encontrado.value[indexActualizadoEncontrado].capacidad = capacidad.value
+      }
 
-  encontrado.value = data.value.filter((item) =>
-    item.matricula.includes(matVeh)
-  )
-  busquedaActiva.value = true
-  return res
+    }).catch((error) => {
+      errores.value = ''
+      if (error.response && error.response.data) {
+        errores.value = error.response.data.errors[0].msg
+        validar()
+      } else {
+        console.log(error);
+      }
+    })
+
 }
 
 function vaciar() {
@@ -257,18 +350,24 @@ function vaciar() {
   
 <style scoped>
 input {
-  width: 100%;
+  width: auto;
   padding: 10px;
   border: 1px solid #ccc;
   margin-bottom: 10px;
   border-radius: 5px;
+  margin: 0;
 }
 
-button {
-  background-color: #0a18e2;
-  color: #fff;
-  padding: 10px;
-  border: none;
+.spinner-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
 }
 
 .tabla {
@@ -296,7 +395,7 @@ td {
   padding: 8px;
 }
 
-tbody tr:hover{
+tbody tr:hover {
   background-color: #1511e018;
   color: black;
   font-weight: bold;

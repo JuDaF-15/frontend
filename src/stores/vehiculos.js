@@ -1,15 +1,20 @@
 import { defineStore } from "pinia"
 import axios from "axios"
+import { ref } from "vue"
 
 export const useVehiculoStore = defineStore("vehiculo", () => {
-    let data = ""
+    let loading = ref(false);
 
     const traerVehiculo = async (info) => {
         try {
+            loading.value = true
             let datos = await axios.get("http://localhost:4506/api/vehiculos", info)
             return datos
         } catch (error) {
+            loading.value = true
             console.log(error);
+        } finally {
+            loading.value = false
         }
     }
 
@@ -29,18 +34,18 @@ export const useVehiculoStore = defineStore("vehiculo", () => {
             let datos = await axios.post("http://localhost:4506/api/vehiculos", info)
             return datos
         } catch (error) {
-            console.log(error);
+            throw(error);
         }
     }
 
-    const actualizarVehiculo = async (id, matricula, c, tipo, marca, modelo, capacidad) => {
+    const actualizarVehiculo = async (id, matricula, chofer_id, tipo, marca, modelo, capacidad) => {
         try {
             let datos = await axios.put(`http://localhost:4506/api/vehiculos/${id}`, {
-                matricula, c, tipo, marca, modelo, capacidad
+                matricula, chofer_id, tipo, marca, modelo, capacidad
             })
             return datos
         } catch (error) {
-            console.log(error);
+            throw(error);
         }
     }
 
@@ -60,6 +65,7 @@ export const useVehiculoStore = defineStore("vehiculo", () => {
         registrarVehiculo,
         traerVehiculoMatricula,
         actualizarVehiculo,
-        actualizarEstado
+        actualizarEstado,
+        loading
     }
 })

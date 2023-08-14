@@ -1,15 +1,20 @@
 import { defineStore } from "pinia"
 import axios from "axios"
+import { ref } from "vue"
 
 export const useRutaStore = defineStore("ruta", () => {
-    let data = ""
+    let loading = ref(false)
 
     const traerRuta = async (info) => {
         try {
+            loading.value = true
             let datos = await axios.get("http://localhost:4506/api/rutas", info)
             return datos
         } catch (error) {
+            loading.value = true
             console.log(error);
+        } finally {
+            loading.value = false
         }
     }
 
@@ -29,7 +34,7 @@ export const useRutaStore = defineStore("ruta", () => {
             let datos = await axios.post("http://localhost:4506/api/rutas", info)
             return datos
         } catch (error) {
-            console.log(error);
+            throw error
         }
     }
 
@@ -40,7 +45,7 @@ export const useRutaStore = defineStore("ruta", () => {
             })
             return datos
         } catch (error) {
-            console.log(error);
+            throw error
         }
     }
 
@@ -60,6 +65,7 @@ export const useRutaStore = defineStore("ruta", () => {
         registrarRuta,
         traerRutaNombre,
         actualizarRuta,
-        actualizarEstado
+        actualizarEstado,
+        loading
     }
 })

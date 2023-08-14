@@ -1,15 +1,20 @@
 import { defineStore } from "pinia"
 import axios from "axios"
+import { ref } from "vue"
 
 export const useVendedorStore = defineStore("vendedor", () => {
-    let data = ""
+    let loading = ref(false);
 
     const traerVendedor = async (info) => {
         try {
+            loading.value = true
             let datos = await axios.get("http://localhost:4506/api/empleados", info)
             return datos
         } catch (error) {
+            loading.value = true
             console.log(error);
+        } finally {
+            loading.value = false
         }
     }
 
@@ -59,6 +64,7 @@ export const useVendedorStore = defineStore("vendedor", () => {
         registrarVendedor,
         traerVendedorCedula,
         actualizarVendedor,
-        actualizarEstado
+        actualizarEstado,
+        loading
     }
 })

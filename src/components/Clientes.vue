@@ -1,11 +1,16 @@
 <template>
     <div>
-        <div>
-            <q-btn label="Registrar Cliente" color="primary" @click="nuevo(); alert = true" />
-            <input type="text" placeholder="Cédula" style="width: 20%;margin-left: 56%;" v-model="cc">
-            <q-btn label="Buscar" color="primary" @click="buscarCedula" />
+        <div class="row">
+            <div class="col">
+                <q-btn label="Registrar Cliente" icon="add" color="primary" @click="alert = true; nuevo()" />
+            </div>
+            <div class="col" style="display: flex;justify-content: flex-end;align-items:center;">
+                <div @click="limpiarBusqueda" style="cursor: pointer;">🗑️</div>
+                <input type="text" placeholder="Cédula" v-model="cc">
+                <q-btn label="Buscar" icon="search" color="primary" @click="buscarCedula" />
+            </div>
         </div><br><br>
-        
+
         <q-dialog v-model="alert">
             <q-card style="width: 32%;">
                 <q-card-section>
@@ -27,6 +32,10 @@
                 </q-card-section>
             </q-card>
         </q-dialog>
+
+        <div class="spinner-container" v-if="useCliente.loading == true">
+            <q-spinner style="margin-left: 10px;" color="black" size="5em" :thickness="10" />
+        </div>
 
         <div class="tabla" v-if="!busquedaActiva">
             <table>
@@ -100,6 +109,8 @@
 <script setup>
 import { useClienteStore } from "../stores/clientes.js"
 import { ref } from "vue"
+import { useQuasar } from 'quasar'
+
 
 const useCliente = useClienteStore()
 let cedula = ref("")
@@ -107,18 +118,42 @@ let nombre = ref("")
 let telefono = ref("")
 
 let data = ref([])
+const $q = useQuasar()
 let cc = ref("")
 let id = ref("")
 let alert = ref(false)
 let encontrado = ref("")
 let busquedaActiva = ref(false)
 let bd = ref("");
+let errores = ref([])
 
 traer();
 
 function nuevo() {
     bd.value = 1
     vaciar()
+}
+
+function validarVacios() {
+    if (cedula.value === "" && nombre.value === "" && telefono.value === "") {
+        $q.notify({
+            message: 'Campos vacíos',
+            color: 'red',
+            icon: 'warning',
+            position: 'top',
+            timeout: Math.random() * 3000
+        })
+    } else return true
+}
+
+function validar() {
+    $q.notify({
+        message: errores,
+        color: 'red',
+        position: 'top',
+        icon: 'warning',
+        timeout: Math.random() * 3000
+    })
 }
 
 async function traer() {
@@ -133,20 +168,35 @@ async function registrar() {
         cedula: cedula.value,
         nombre: nombre.value,
         telefono: telefono.value
+    }).then((res) => {
+        alert.value = false
+        vaciar()
+
+        if (data) {
+            data.value.unshift(res.data.pasajero);
+        }
+
+        $q.notify({
+            message: 'Cliente agregado exitosamente',
+            color: 'green',
+            position: 'top',
+            icon: 'check',
+            timeout: Math.random() * 3000
+        })
+
+        if (busquedaActiva.value) {
+            const cedulaPasa = cc.value;
+            encontrado.value = data.value.filter(item => item.cedula.includes(cedulaPasa));
+        }
+    }).catch((error) => {
+        if (error.response && error.response.data && validarVacios() === true) {
+            errores.value = error.response.data.errors[0].msg
+            validar()
+
+        } else {
+            console.log(error);
+        }
     })
-
-    alert.value = false
-    vaciar()
-
-    if (data) {
-        data.value.unshift(res.data.pasajero);
-    }
-
-    if (busquedaActiva.value) {
-        const cedulaPasa = cc.value;
-        encontrado.value = data.value.filter(item => item.cedula.includes(cedulaPasa));
-    }
-
 }
 
 async function estado(cliente) {
@@ -162,15 +212,30 @@ async function estado(cliente) {
     traer()
 }
 
-async function buscarCedula() {
-    const cedulaPasa = cc.value.trim()
-    let res = await useCliente.traerPasajeroCedula(cedulaPasa)
+function limpiarBusqueda() {
+    cc.value = ""
+    busquedaActiva.value = false
+}
 
-    encontrado.value = data.value.filter((item) =>
-        item.cedula.includes(cedulaPasa)
-    )
-    busquedaActiva.value = true
-    return res
+async function buscarCedula() {
+    if (cc.value.trim() == "") {
+        $q.notify({
+            message: 'Introduzca la cédula a buscar',
+            color: 'red',
+            position: 'top',
+            icon: 'warning',
+            timeout: Math.random() * 3000
+        })
+    } else {
+        const cedulaPasa = cc.value.trim()
+        let res = await useCliente.traerPasajeroCedula(cedulaPasa)
+
+        encontrado.value = data.value.filter((item) =>
+            item.cedula.includes(cedulaPasa)
+        )
+        busquedaActiva.value = true
+        return res
+    }
 }
 
 function editarCliente(cliente) {
@@ -180,21 +245,46 @@ function editarCliente(cliente) {
     nombre.value = cliente.nombre;
     telefono.value = cliente.telefono;
     alert.value = true;
-    console.log(cliente);
 }
 
 async function actualizar() {
     const res = await useCliente.actualizarCliente(id.value, cedula.value, nombre.value, telefono.value)
-    console.log(res);
+        .then((res) => {
 
-    const indexActualizado = data.value.findIndex((client) => client._id === id.value);
-    if (indexActualizado !== -1) {
-        data.value[indexActualizado].cedula = cedula.value;
-        data.value[indexActualizado].nombre = nombre.value;
-        data.value[indexActualizado].telefono = telefono.value;
-    }
-    alert.value = false
-    traer()
+            alert.value = false
+            traer()
+
+            const indexActualizado = data.value.findIndex((client) => client._id === id.value);
+            if (indexActualizado !== -1) {
+                data.value[indexActualizado].cedula = cedula.value;
+                data.value[indexActualizado].nombre = nombre.value;
+                data.value[indexActualizado].telefono = telefono.value;
+            }
+
+            $q.notify({
+                message: 'Cliente editado exitosamente',
+                color: 'green',
+                position: 'top',
+                icon: 'check',
+                timeout: Math.random() * 3000
+            })
+
+            const indexActualizadoEncontrado = encontrado.value.findIndex((client) => client._id === id.value);
+            if (indexActualizadoEncontrado !== -1) {
+                encontrado.value[indexActualizadoEncontrado].cedula = cedula.value;
+                encontrado.value[indexActualizadoEncontrado].nombre = nombre.value;
+                encontrado.value[indexActualizadoEncontrado].telefono = telefono.value;
+            }
+        }).catch((error) => {
+            errores.value = ''
+            if (error.response && error.response.data && validarVacios() === true) {
+                errores.value = error.response.data.errors[0].msg
+                validar()
+            } else {
+                console.log(error);
+            }
+        })
+
 }
 function vaciar() {
     cedula.value = ""
@@ -206,11 +296,24 @@ function vaciar() {
   
 <style scoped>
 input {
-    width: 100%;
+    width: auto;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    margin-bottom: 10px
+    margin-bottom: 10px;
+    margin: 0
+}
+
+.spinner-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
 }
 
 .tabla {
@@ -238,10 +341,10 @@ thead {
     z-index: 1;
 }
 
-tbody tr:hover{
-  background-color: #1511e018;
-  color: black;
-  font-weight: bold;
-  cursor: pointer;
+tbody tr:hover {
+    background-color: #1511e018;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
 }
 </style>

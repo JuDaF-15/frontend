@@ -59,17 +59,21 @@
             </div>
             <div class="col" v-if="mostrarVenta">
                 <p style="font-weight: bold;font-size: larger;">Asiento # {{ puesto }}</p>
+                <div>
+                    <q-btn color="primary" style="width: 100%;" @click="buscarCliente()">Buscar Cliente</q-btn>
+                </div>
+
                 <label>Cédula Cliente</label>
                 <input type="text" v-model="cedula">
 
-                <!-- <label>Teléfono</label>
-                <input type="text" v-model="telefono">
+                <label>Teléfono</label>
+                <input type="text" v-model="telefono" :disabled="true">
 
                 <label>Nombre</label>
-                <input type="text" v-model="nombre"> -->
+                <input type="text" v-model="nombre" :disabled="true">
 
                 <div style="margin-top: 10px;">
-                    <q-btn color="primary" style="width: 100%;" @click="guardarTiquete();buscarCliente()">Confirmar</q-btn>
+                    <q-btn color="primary" style="width: 100%;" @click="guardarTiquete()">Confirmar</q-btn>
                 </div>
             </div>
         </div>
@@ -82,6 +86,7 @@ import { useVehiculoStore } from "../stores/vehiculos.js";
 import { useRutaStore } from "../stores/rutas.js";
 import { useClienteStore } from "../stores/clientes.js";
 import { useTiqueteStore } from "../stores/tiquetes.js"
+
 
 const useVehiculo = useVehiculoStore();
 const useRuta = useRutaStore();
@@ -119,20 +124,21 @@ async function traerVehiculo() {
 
 traerVehiculo();
 
+
 async function buscarCliente() {
     let res = await useCliente.traerPasajeroCedula(cedula.value)
     console.log(res.data);
+
     idCliente.value = res.data._id
-    console.log(idCliente);
-    /* telefono.value = res.data.telefono
-    nombre.value = res.data.nombre */
+    telefono.value = res.data.telefono
+    nombre.value = res.data.nombre
 }
 
 /* numero, vehiculo_matricula, empleado, cedula_pasajero, num_acientos, fecha_salida, hora_salida, tipo_pago, ruta, estado */
 
 async function guardarTiquete() {
     let r = await useTiquetes.postTiquete({
-        numero: "101010101",
+        numero: Math.floor(Math.random() * 900000) + 100000,
         vehiculo_matricula: selectedVehiculo.value._id,
         empleado: "64cc0467ca96b9c2e8cb2044",
         cedula_pasajero: idCliente.value,

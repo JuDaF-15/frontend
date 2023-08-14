@@ -1,9 +1,16 @@
 <template>
     <div>
         <div>
-            <q-btn label="Registrar Ruta" color="primary" @click="alert = true; nuevo()" />
-            <input type="text" placeholder="Nombre de Ruta" style="width: 20%;margin-left: 58%;" v-model="nom">
-            <q-btn label="Buscar" color="primary" @click="buscarNombre" />
+            <div class="row">
+                <div class="col">
+                    <q-btn label="Registrar Ruta" icon="add" color="primary" @click="alert = true; nuevo()" />
+                </div>
+                <div class="col" style="display: flex;justify-content: flex-end;align-items:center;">
+                    <div @click="limpiarBusqueda" style="cursor: pointer;">🗑️</div>
+                    <input type="text" placeholder="Nombre de Ruta" v-model="nom">
+                    <q-btn label="Buscar" icon="search" color="primary" @click="buscarNombre" />
+                </div>
+            </div>
         </div><br><br>
 
         <q-dialog v-model="alert">
@@ -30,6 +37,10 @@
                 </q-card-section>
             </q-card>
         </q-dialog>
+
+        <div class="spinner-container" v-if="useRuta.loading == true">
+            <q-spinner style="margin-left: 10px;" color="black" size="5em" :thickness="10" />
+        </div>
 
         <div class="tabla" v-if="!busquedaActiva">
             <table>
@@ -115,6 +126,8 @@
 <script setup>
 import { useRutaStore } from "../stores/rutas.js"
 import { ref } from "vue"
+import { useQuasar } from 'quasar'
+
 
 const useRuta = useRutaStore()
 let codigoRuta = ref("")
@@ -124,6 +137,7 @@ let origen = ref("")
 let destino = ref("")
 let valor = ref("")
 
+const $q = useQuasar()
 let nom = ref("")
 let alert = ref(false)
 let id = ref("")
@@ -131,12 +145,36 @@ let bd = ref("")
 let encontrado = ref("")
 let busquedaActiva = ref(false)
 let data = ref([])
+let errores = ref([])
 
 traer();
 
 function nuevo() {
     bd.value = 1
     vaciar()
+}
+
+function validarVacios() {
+    if (codigoRuta.value === "" && nombre.value === "" && origen.value === "" && destino.value === ""
+        && hora_salida.value === "") {
+        $q.notify({
+            message: 'Campos vacíos',
+            color: 'red',
+            icon: 'warning',
+            position: 'top',
+            timeout: Math.random() * 3000
+        })
+    } else return true
+}
+
+function validar() {
+    $q.notify({
+        message: errores,
+        color: 'red',
+        position: 'top',
+        icon: 'warning',
+        timeout: Math.random() * 3000
+    })
 }
 
 async function traer() {
@@ -154,19 +192,35 @@ async function registrar() {
         destino: destino.value,
         valor: valor.value,
         hora_salida: hora_salida.value
+    }).then((res) => {
+        alert.value = false
+        vaciar()
+
+        if (data) {
+            data.value.unshift(res.data.ruta);
+        }
+
+        $q.notify({
+            message: 'Ruta agregada exitosamente',
+            color: 'green',
+            position: 'top',
+            icon: 'check',
+            timeout: Math.random() * 3000
+        })
+
+        if (busquedaActiva.value) {
+            const nomRuta = nom.value;
+            encontrado.value = data.value.filter(item => item.nombre.includes(nomRuta));
+        }
+    }).catch((error) => {
+        if (error.response && error.response.data && validarVacios() === true) {
+            errores.value = error.response.data.errors[0].msg
+            validar()
+
+        } else {
+            console.log(error);
+        }
     })
-
-    alert.value = false
-    vaciar()
-
-    if (data) {
-        data.value.unshift(res.data.ruta);
-    }
-
-    if (busquedaActiva.value) {
-        const nomRuta = nom.value;
-        encontrado.value = data.value.filter(item => item.nombre.includes(nomRuta));
-    }
 }
 
 async function estado(ruta) {
@@ -182,15 +236,30 @@ async function estado(ruta) {
     traer()
 }
 
-async function buscarNombre() {
-    const nomRuta = nom.value.trim()
-    let res = await useRuta.traerRutaNombre(nomRuta)
+function limpiarBusqueda() {
+    nom.value = ""
+    busquedaActiva.value = false
+}
 
-    encontrado.value = data.value.filter((item) =>
-        item.nombre.includes(nomRuta)
-    )
-    busquedaActiva.value = true
-    return res
+async function buscarNombre() {
+    if (nom.value.trim() == "") {
+        $q.notify({
+            message: 'Introduzca el nombre a buscar',
+            color: 'red',
+            position: 'top',
+            icon: 'warning',
+            timeout: Math.random() * 3000
+        })
+    } else {
+        const nomRuta = nom.value.trim()
+        let res = await useRuta.traerRutaNombre(nomRuta)
+
+        encontrado.value = data.value.filter((item) =>
+            item.nombre.includes(nomRuta)
+        )
+        busquedaActiva.value = true
+        return res
+    }
 }
 
 function vaciar() {
@@ -212,37 +281,82 @@ function editarRuta(ruta) {
     valor.value = ruta.valor
     hora_salida.value = ruta.hora_salida
 
-    alert.value = true;
-    console.log(ruta);
+    alert.value = true
 }
+
 
 async function actualizar() {
     const res = await useRuta.actualizarRuta(id.value, codigoRuta.value, nombre.value, origen.value, destino.value,
         valor.value, hora_salida.value)
-    console.log(res);
+        .then((res) => {
+            alert.value = false;
+            traer()
 
-    const indexActualizado = data.value.findIndex((rutas) => rutas._id === id.value);
-    if (indexActualizado !== -1) {
-        data.value[indexActualizado].codigoRuta = codigoRuta.value;
-        data.value[indexActualizado].nombre = nombre.value;
-        data.value[indexActualizado].origen = origen.value
-        data.value[indexActualizado].destino = destino.value
-        data.value[indexActualizado].valor = valor.value
-        data.value[indexActualizado].hora_salida = hora_salida.value;
-    }
-    alert.value = false
-    traer()
+            // Actualiza el registro en 'data'
+            const indexActualizadoData = data.value.findIndex((rutas) => rutas._id === id.value);
+            if (indexActualizadoData !== -1) {
+                data.value[indexActualizadoData].codigoRuta = codigoRuta.value;
+                data.value[indexActualizadoData].nombre = nombre.value;
+                data.value[indexActualizadoData].origen = origen.value;
+                data.value[indexActualizadoData].destino = destino.value;
+                data.value[indexActualizadoData].valor = valor.value;
+                data.value[indexActualizadoData].hora_salida = hora_salida.value;
+            }
+
+            $q.notify({
+                message: "Ruta editada exitosamente",
+                color: 'green',
+                position: 'top',
+                icon: 'check',
+                timeout: Math.random() * 3000
+            });
+
+            // Actualiza el registro en 'encontrado', si existe
+            const indexActualizadoEncontrado = encontrado.value.findIndex((rutas) => rutas._id === id.value);
+            if (indexActualizadoEncontrado !== -1) {
+                encontrado.value[indexActualizadoEncontrado].codigoRuta = codigoRuta.value;
+                encontrado.value[indexActualizadoEncontrado].nombre = nombre.value;
+                encontrado.value[indexActualizadoEncontrado].origen = origen.value;
+                encontrado.value[indexActualizadoEncontrado].destino = destino.value;
+                encontrado.value[indexActualizadoEncontrado].valor = valor.value;
+                encontrado.value[indexActualizadoEncontrado].hora_salida = hora_salida.value;
+            }
+
+        }).catch((error) => {
+            errores.value = '';
+            if (error.response && error.response.data && validarVacios() === true) {
+                errores.value = error.response.data.errors[0].msg;
+                validar();
+            } else {
+                console.log(error);
+            }
+        });
+
 }
+
 
 </script>
   
 <style scoped>
 input {
-    width: 100%;
+    width: auto;
     padding: 10px;
     border: 1px solid #ccc;
     margin-bottom: 10px;
     border-radius: 5px;
+    margin: 0;
+}
+
+.spinner-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8);
 }
 
 .tabla {
@@ -278,11 +392,11 @@ thead {
     z-index: 1;
 }
 
-tbody tr:hover{
-  background-color: #1511e018;
-  color: black;
-  font-weight: bold;
-  cursor: pointer;
+tbody tr:hover {
+    background-color: #1511e018;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
 }
 </style>
   

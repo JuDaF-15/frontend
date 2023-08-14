@@ -15,7 +15,11 @@
           <input type="password" class="input-with-icon" v-model="clave" />
         </p>
         <p>
-          <button class="log" @click="iniciarSesion()">Ingresar</button>
+          <button class="log" @click="iniciarSesion()">
+            <span class="button-text">Ingresar</span>
+            <q-spinner style="margin-left: 10px;" color="white" size="2em" :thickness="10"
+              v-if="useLogin.loading === true" />
+          </button>
         </p>
       </form>
     </div>

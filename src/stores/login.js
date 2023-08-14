@@ -4,7 +4,6 @@ import { ref } from "vue"
 
 export const useLoginStore = defineStore("login", () => {
   let loading = ref(false)
-  let usuario = ref("")
 
   const logi = async (usuario, clave) => {
     try {
@@ -20,6 +19,7 @@ export const useLoginStore = defineStore("login", () => {
     }
   };
   return {
-    logi
+    logi,
+    loading
   };
 });

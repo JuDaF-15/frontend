@@ -1,9 +1,14 @@
 <template>
     <div>
-        <div>
-            <q-btn label="Registrar Vendedor" color="primary" @click="alert = true; nuevo()" />
-            <input type="text" placeholder="Cédula" style="width: 20%;margin-left: 55%;" v-model="cc">
-            <q-btn label="Buscar" color="primary" @click="buscarCedula" />
+        <div class="row">
+            <div class="col">
+                <q-btn label="Registrar Vendedor" icon="add" color="primary" @click="alert = true; nuevo()" />
+            </div>
+            <div class="col" style="display: flex;justify-content: flex-end;align-items:center ;">
+                <div @click="limpiarBusqueda" style="cursor: pointer;">🗑️</div>
+                <input type="text" placeholder="Cédula" v-model="cc">
+                <q-btn label="Buscar" icon="search" color="primary" @click="buscarCedula" />
+            </div>
         </div><br><br>
 
         <q-dialog v-model="alert">
@@ -29,6 +34,10 @@
                 </q-card-section>
             </q-card>
         </q-dialog>
+
+        <div class="spinner-container" v-if="useVendedor.loading == true">
+            <q-spinner style="margin-left: 10px;" color="black" size="5em" :thickness="10" />
+        </div>
 
         <div class="tabla" v-if="!busquedaActiva">
             <table>
@@ -118,6 +127,8 @@ let username = ref("")
 let clave = ref("")
 
 const $q = useQuasar()
+const $a = useQuasar()
+
 let cc = ref("")
 let alert = ref(false)
 let data = ref([])
@@ -135,16 +146,16 @@ function nuevo() {
 }
 
 function validarVacios() {
-  if (cedula.value === "" && nombre.value === "" && telefono.value === "" && username.value === ""
-    && clave.value === "") {
-    $q.notify({
-      message: 'Campos vacíos',
-      color: 'red',
-      icon: 'warning',
-      position: 'top',
-      timeout: Math.random() * 3000
-    })
-  } else return true
+    if (cedula.value === "" && nombre.value === "" && telefono.value === "" && username.value === ""
+        && clave.value === "") {
+        $q.notify({
+            message: 'Campos vacíos',
+            color: 'red',
+            icon: 'warning',
+            position: 'top',
+            timeout: Math.random() * 3000
+        })
+    } else return true
 }
 
 function validar() {
@@ -155,6 +166,7 @@ function validar() {
         icon: 'warning',
         timeout: Math.random() * 3000
     })
+    return true
 }
 
 async function traer() {
@@ -175,19 +187,19 @@ async function registrar() {
         alert.value = false
         vaciar()
 
+        if (data) {
+            data.value.unshift(res.data.empleado);
+        }
+
         $q.notify({
-            message: 'Vendedor agregado exitosamente',
+            message: 'Vehículo agregado exitosamente',
             color: 'green',
             position: 'top',
             icon: 'check',
             timeout: Math.random() * 3000
         })
-
-        if (data) {
-            data.value.unshift(res.data.empleado);
-        }
     }).catch((error) => {
-        if (error.response && error.response.data && validarVacios()===true) {
+        if (error.response && error.response.data && validarVacios() === true) {
             errores.value = error.response.data.errors[0].msg
             validar()
 
@@ -216,15 +228,30 @@ async function estado(empleado) {
     traer()
 }
 
-async function buscarCedula() {
-    const cedulaEmple = cc.value.trim()
-    let res = await useVendedor.traerVendedorCedula(cedulaEmple)
+function limpiarBusqueda() {
+    cc.value = ""
+    busquedaActiva.value = false
+}
 
-    encontrado.value = data.value.filter((item) =>
-        item.cedula.includes(cedulaEmple)
-    )
-    busquedaActiva.value = true
-    return res
+async function buscarCedula() {
+    if (cc.value.trim() == "") {
+        $q.notify({
+            message: 'Introduzca la cédula a buscar',
+            color: 'red',
+            position: 'top',
+            icon: 'warning',
+            timeout: Math.random() * 3000
+        })
+    } else {
+        const cedulaEmple = cc.value.trim()
+        let res = await useVendedor.traerVendedorCedula(cedulaEmple)
+
+        encontrado.value = data.value.filter((item) =>
+            item.cedula.includes(cedulaEmple)
+        )
+        busquedaActiva.value = true
+        return res
+    }
 }
 
 function vaciar() {
@@ -251,7 +278,8 @@ async function actualizar() {
     const res = await useVendedor.actualizarVendedor(id.value, cedula.value, nombre.value,
         telefono.value, username.value, clave.value)
         .then((res) => {
-            console.log(res);
+            alert.value = false
+            traer()
 
             const indexActualizado = data.value.findIndex((vendedor) => vendedor._id === id.value);
             if (indexActualizado !== -1) {
@@ -261,9 +289,6 @@ async function actualizar() {
                 data.value[indexActualizado].username = username.value;
                 data.value[indexActualizado].clave = clave.value;
             }
-            alert.value = false
-            traer()
-
             $q.notify({
                 message: 'Vendedor editado exitosamente',
                 color: 'green',
@@ -272,9 +297,18 @@ async function actualizar() {
                 timeout: Math.random() * 3000
             })
 
+            const indexActualizadoEncontrado = encontrado.value.findIndex((vendedor) => vendedor._id === id.value);
+            if (indexActualizadoEncontrado !== -1) {
+                encontrado.value[indexActualizadoEncontrado].cedula = cedula.value;
+                encontrado.value[indexActualizadoEncontrado].nombre = nombre.value;
+                encontrado.value[indexActualizadoEncontrado].telefono = telefono.value;
+                encontrado.value[indexActualizadoEncontrado].username = username.value;
+                encontrado.value[indexActualizadoEncontrado].clave = clave.value;
+            }
+
         }).catch((error) => {
             errores.value = ''
-            if (error.response && error.response.data && validarVacios()===true) {
+            if (error.response && error.response.data && validarVacios() === true) {
                 errores.value = error.response.data.errors[0].msg
                 validar()
             } else {
@@ -287,11 +321,24 @@ async function actualizar() {
   
 <style scoped>
 input {
-    width: 100%;
+    width: auto;
     padding: 10px;
     border: 1px solid #ccc;
     margin-bottom: 10px;
     border-radius: 5px;
+    margin: 0;
+}
+
+.spinner-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
 }
 
 .tabla {
@@ -320,11 +367,11 @@ thead {
     z-index: 1;
 }
 
-tbody tr:hover{
-  background-color: #1511e018;
-  color: black;
-  font-weight: bold;
-  cursor: pointer;
+tbody tr:hover {
+    background-color: #1511e018;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
 }
 </style>
   

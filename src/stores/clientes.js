@@ -1,14 +1,20 @@
 import { defineStore } from "pinia"
 import axios from "axios"
+import { ref } from "vue"
 
 export const useClienteStore = defineStore("cliente", () => {
+    let loading = ref(false);
 
     const traerCliente = async (info) => {
         try {
+            loading.value = true
             let datos = await axios.get("http://localhost:4506/api/pasajeros", info)
-            return datos //return
+            return datos
         } catch (error) {
+            loading.value = true
             console.log(error);
+        } finally {
+            loading.value = false
         }
     }
     const traerPasajeroCedula = async (cedula) => {
@@ -27,7 +33,7 @@ export const useClienteStore = defineStore("cliente", () => {
             let datos = await axios.post("http://localhost:4506/api/pasajeros", info)
             return datos
         } catch (error) {
-            console.log(error);
+            throw error
         }
     }
 
@@ -38,7 +44,7 @@ export const useClienteStore = defineStore("cliente", () => {
             });
             return datos;
         } catch (error) {
-            console.log(error);
+            throw error
         }
     };
 
@@ -57,6 +63,7 @@ export const useClienteStore = defineStore("cliente", () => {
         registrarCliente,
         traerPasajeroCedula,
         actualizarCliente,
-        actualizarEstado
+        actualizarEstado,
+        loading
     }
 })

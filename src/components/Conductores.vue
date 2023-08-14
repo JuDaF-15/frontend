@@ -1,10 +1,14 @@
 <template>
   <div>
-
-    <div>
-      <q-btn label="Registrar Conductor" color="primary" @click="alert = true; nuevo()" />
-      <input type="text" placeholder="Cédula" style="width: 20%;margin-left: 52%;" v-model="cc">
-      <q-btn label="Buscar" color="primary" @click="buscarCedula" />
+    <div class="row">
+      <div class="col">
+        <q-btn label="Registrar Conductor" icon="add" color="primary" @click="alert = true; nuevo()" />
+      </div>
+      <div class="col" style="display: flex;justify-content: flex-end;align-items:center;">
+        <div @click="limpiarBusqueda" style="cursor: pointer;">🗑️</div>
+        <input type="text" placeholder="Cédula" v-model="cc">
+        <q-btn label="Buscar" icon="search" color="primary" @click="buscarCedula" />
+      </div>
     </div><br><br>
 
     <q-dialog v-model="alert">
@@ -33,6 +37,10 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <div class="spinner-container" v-if="useConductor.loading == true">
+      <q-spinner style="margin-left: 10px;" color="black" size="5em" :thickness="10" />
+    </div>
 
     <div class="tabla" v-if="!busquedaActiva">
       <table>
@@ -231,14 +239,25 @@ async function registrar() {
 }
 
 async function buscarCedula() {
-  const cedulaConduct = cc.value.trim()
-  let res = await useConductor.traerConductorCedula(cedulaConduct)
+  if (cc.value.trim() == "") {
+    $q.notify({
+      message: 'Introduzca la cédula a buscar',
+      color: 'red',
+      position: 'top',
+      icon: 'warning',
+      timeout: Math.random() * 3000
+    })
+  } else {
+    const cedulaConduct = cc.value.trim()
+    let res = await useConductor.traerConductorCedula(cedulaConduct)
 
-  encontrado.value = data.value.filter((item) =>
-    item.cedula.includes(cedulaConduct)
-  )
-  busquedaActiva.value = true
-  return res
+    encontrado.value = data.value.filter((item) =>
+      item.cedula.includes(cedulaConduct)
+    )
+    busquedaActiva.value = true
+    return res
+  }
+
 }
 
 function vaciar() {
@@ -249,6 +268,11 @@ function vaciar() {
   categoria_licencia.value = ""
   fecha_vencimiento.value = ""
   experiencia.value = ""
+}
+
+function limpiarBusqueda() {
+  cc.value = ""
+  busquedaActiva.value = false
 }
 
 function editarChofer(chofer) {
@@ -262,7 +286,6 @@ function editarChofer(chofer) {
   fecha_vencimiento.value = chofer.fecha_vencimiento
   experiencia.value = chofer.experiencia
   alert.value = true;
-  console.log(chofer);
 }
 
 async function actualizar() {
@@ -270,6 +293,7 @@ async function actualizar() {
     numero_licencia.value, categoria_licencia.value, fecha_vencimiento.value, experiencia.value)
     .then((res) => {
       alert.value = false
+      traer()
 
       const indexActualizado = data.value.findIndex((conductor) => conductor._id === id.value);
       if (indexActualizado !== -1) {
@@ -280,7 +304,9 @@ async function actualizar() {
         data.value[indexActualizado].categoria_licencia = categoria_licencia.value;
         data.value[indexActualizado].fecha_vencimiento = fecha_vencimiento.value;
         data.value[indexActualizado].experiencia = experiencia.value;
+
       }
+
       $q.notify({
         message: 'Conductor editado exitosamente',
         color: 'green',
@@ -288,7 +314,19 @@ async function actualizar() {
         icon: 'check',
         timeout: Math.random() * 3000
       })
-      traer()
+
+      const indexActualizadoEncontrado = encontrado.value.findIndex((conductor) => conductor._id === id.value);
+      if (indexActualizadoEncontrado !== -1) {
+        encontrado.value[indexActualizadoEncontrado].cedula = cedula.value;
+        encontrado.value[indexActualizadoEncontrado].nombre = nombre.value;
+        encontrado.value[indexActualizadoEncontrado].telefono = telefono.value;
+        encontrado.value[indexActualizadoEncontrado].numero_licencia = numero_licencia.value;
+        encontrado.value[indexActualizadoEncontrado].categoria_licencia = categoria_licencia.value;
+        encontrado.value[indexActualizadoEncontrado].fecha_vencimiento = fecha_vencimiento.value;
+        encontrado.value[indexActualizadoEncontrado].experiencia = experiencia.value;
+
+      }
+
     }).catch((error) => {
       errores.value = ''
       if (error.response && error.response.data && validarVacios() === true) {
@@ -299,18 +337,30 @@ async function actualizar() {
         console.log(error);
       }
     })
-
 }
 
 </script>
 
 <style scoped>
 input {
-  width: 100%;
   padding: 10px;
   border: 1px solid #ccc;
   margin-bottom: 10px;
   border-radius: 5px;
+  width: auto;
+  margin: 0;
+}
+
+.spinner-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
 }
 
 .tabla {
@@ -338,12 +388,10 @@ thead {
   z-index: 1;
 }
 
-tbody tr:hover{
+tbody tr:hover {
   background-color: #1511e018;
   color: black;
   font-weight: bold;
   cursor: pointer;
 }
-
-
 </style>
