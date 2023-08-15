@@ -10,7 +10,7 @@
         <q-btn label="Buscar" icon="search" color="primary" @click="buscarMatricula" />
       </div>
     </div><br><br>
-
+    <h5 style="margin-top: -15px;text-align: center;">Vehículos</h5>
     <q-dialog v-model="alert">
       <q-card style="width: 32%;">
         <q-card-section>
@@ -33,6 +33,7 @@
           <q-card-actions align="right">
             <q-btn v-if="bd == 1" style="margin-top: -10px;" label="Guardar" color="primary" @click="registrar" />
             <q-btn v-else style="margin-top: -10px;" label="Actualizar" color="primary" @click="actualizar" />
+            <q-btn label="Cancelar" style="margin-top: -10px;" color="negative" v-close-popup />
           </q-card-actions>
         </q-card-section>
       </q-card>
@@ -199,7 +200,7 @@ function validar() {
 
 async function registrar() {
   let res = await useVehiculo.registrarVehiculo({
-    matricula: matricula.value,
+    matricula: matricula.value.split(" ").join(""),
     chofer_id: c.value,
     tipo: tipo.value,
     marca: marca.value,
@@ -221,9 +222,22 @@ async function registrar() {
       icon: 'check',
       timeout: Math.random() * 3000
     })
-
+    if (busquedaActiva.value) {
+      const matVeh = mat.value;
+      encontrado.value = data.value.filter(item => item.matricula.includes(matVeh));
+    }
   }).catch((error) => {
-    if (error.response && error.response.data && validarVacios() === true) {
+    if (error.response && error.response.data.mensaje) {
+      const repetida = error.response.data.mensaje
+      $q.notify({
+        message: repetida,
+        color: 'red',
+        position: 'top',
+        icon: 'warning',
+        timeout: Math.random() * 3000
+      })
+    }
+    else if (error.response && error.response.data && validarVacios() === true) {
       errores.value = error.response.data.errors[0].msg
       validar()
 
@@ -231,10 +245,7 @@ async function registrar() {
       console.log(error);
     }
   });
-  if (busquedaActiva.value) {
-    const matVeh = mat.value;
-    encontrado.value = data.value.filter(item => item.matricula.includes(matVeh));
-  }
+
 }
 
 async function estado(vehiculo) {
@@ -255,7 +266,6 @@ function limpiarBusqueda() {
 }
 
 async function buscarMatricula() {
-
   if (mat.value.trim() == "") {
     $q.notify({
       message: 'Introduzca la matrícula a buscar',
@@ -266,13 +276,24 @@ async function buscarMatricula() {
     })
   } else {
     const matVeh = mat.value.trim()
-    let res = await useVehiculo.traerVehiculoMatricula(matVeh)
-
-    encontrado.value = data.value.filter((item) =>
-      item.matricula.includes(matVeh)
-    )
-    busquedaActiva.value = true
-    return res
+    await useVehiculo.traerVehiculoMatricula(matVeh)
+      .then((res) => {
+        encontrado.value = data.value.filter((item) =>
+          item.matricula.includes(matVeh)
+        )
+        busquedaActiva.value = true
+      }).catch((error) => {
+        if (error.response && error.response.data.mensaje) {
+          const noEncontrado = error.response.data.mensaje
+          $q.notify({
+            message: noEncontrado,
+            color: 'red',
+            position: 'top',
+            icon: 'warning',
+            timeout: Math.random() * 3000
+          })
+        }
+      })
   }
 
 }
@@ -291,7 +312,7 @@ function editarVehiculo(vehiculo) {
 }
 
 async function actualizar() {
-  const res = await useVehiculo.actualizarVehiculo(id.value, matricula.value, c.value, tipo.value,
+  const res = await useVehiculo.actualizarVehiculo(id.value, matricula.value.split(" ").join(""), c.value, tipo.value,
     marca.value, modelo.value, capacidad.value)
     .then((res) => {
       console.log(res);
@@ -300,7 +321,7 @@ async function actualizar() {
 
       const indexActualizado = data.value.findIndex((vehiculos) => vehiculos._id === id.value);
       if (indexActualizado !== -1) {
-        data.value[indexActualizado].matricula = matricula.value;
+        data.value[indexActualizado].matricula = matricula.value.split(" ").join("");
         data.value[indexActualizado].chofer_id._id = c.value
         data.value[indexActualizado].tipo = tipo.value
         data.value[indexActualizado].marca = marca.value
@@ -327,7 +348,17 @@ async function actualizar() {
 
     }).catch((error) => {
       errores.value = ''
-      if (error.response && error.response.data) {
+      if (error.response && error.response.data.mensaje) {
+        const repetida = error.response.data.mensaje
+        $q.notify({
+          message: repetida,
+          color: 'red',
+          position: 'top',
+          icon: 'warning',
+          timeout: Math.random() * 3000
+        })
+      }
+      else if (error.response && error.response.data) {
         errores.value = error.response.data.errors[0].msg
         validar()
       } else {

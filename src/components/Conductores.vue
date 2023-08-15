@@ -10,6 +10,7 @@
         <q-btn label="Buscar" icon="search" color="primary" @click="buscarCedula" />
       </div>
     </div><br><br>
+    <h5 style="margin-top: -15px;text-align: center;">Conductores</h5>
 
     <q-dialog v-model="alert">
       <q-card style="width: 32%;">
@@ -33,6 +34,7 @@
           <q-card-actions align="right">
             <q-btn v-if="bd == 1" style="margin-top: -10px;" label="Guardar" color="primary" @click="registrar()" />
             <q-btn v-else style="margin-top: -10px;" label="Actualizar" color="primary" @click="actualizar()" />
+            <q-btn label="Cancelar" style="margin-top: -10px;" color="negative" v-close-popup />
           </q-card-actions>
         </q-card-section>
       </q-card>
@@ -41,7 +43,6 @@
     <div class="spinner-container" v-if="useConductor.loading == true">
       <q-spinner style="margin-left: 10px;" color="black" size="5em" :thickness="10" />
     </div>
-
     <div class="tabla" v-if="!busquedaActiva">
       <table>
         <thead>
@@ -211,6 +212,10 @@ async function registrar() {
     alert.value = false
     vaciar()
 
+    if (data) {
+      data.value.unshift(res.data.chofer);
+    }
+
     $q.notify({
       message: 'Conductor agregado exitosamente',
       color: 'green',
@@ -219,11 +224,21 @@ async function registrar() {
       timeout: Math.random() * 3000
     })
 
-    if (data) {
-      data.value.unshift(res.data.chofer);
+    if (busquedaActiva.value) {
+      const cedulaConduct = cc.value;
+      encontrado.value = data.value.filter(item => item.cedula.includes(cedulaConduct));
     }
   }).catch((error) => {
-    if (error.response && error.response.data && validarVacios() === true) {
+    if (error.response && error.response.data.mensaje) {
+      const repetida = error.response.data.mensaje
+      $q.notify({
+        message: repetida,
+        color: 'red',
+        position: 'top',
+        icon: 'warning',
+        timeout: Math.random() * 3000
+      })
+    } else if (error.response && error.response.data && validarVacios() === true) {
       errores.value = error.response.data.errors[0].msg
       validar()
 
@@ -231,11 +246,6 @@ async function registrar() {
       console.log(error);
     }
   });
-
-  if (busquedaActiva.value) {
-    const cedulaConduct = cc.value;
-    encontrado.value = data.value.filter(item => item.cedula.includes(cedulaConduct));
-  }
 }
 
 async function buscarCedula() {
@@ -249,15 +259,25 @@ async function buscarCedula() {
     })
   } else {
     const cedulaConduct = cc.value.trim()
-    let res = await useConductor.traerConductorCedula(cedulaConduct)
-
-    encontrado.value = data.value.filter((item) =>
-      item.cedula.includes(cedulaConduct)
-    )
-    busquedaActiva.value = true
-    return res
+    await useConductor.traerConductorCedula(cedulaConduct)
+      .then((res) => {
+        encontrado.value = data.value.filter((item) =>
+          item.cedula.includes(cedulaConduct)
+        )
+        busquedaActiva.value = true
+      }).catch((error) => {
+        if (error.response && error.response.data.mensaje) {
+          const noEncontrado = error.response.data.mensaje
+          $q.notify({
+            message: noEncontrado,
+            color: 'red',
+            position: 'top',
+            icon: 'warning',
+            timeout: Math.random() * 3000
+          })
+        }
+      })
   }
-
 }
 
 function vaciar() {
@@ -329,7 +349,17 @@ async function actualizar() {
 
     }).catch((error) => {
       errores.value = ''
-      if (error.response && error.response.data && validarVacios() === true) {
+      if (error.response && error.response.data.mensaje) {
+        const repetida = error.response.data.mensaje
+        $q.notify({
+          message: repetida,
+          color: 'red',
+          position: 'top',
+          icon: 'warning',
+          timeout: Math.random() * 3000
+        })
+      }
+      else if (error.response && error.response.data && validarVacios() === true) {
         errores.value = error.response.data.errors[0].msg
         validar()
 

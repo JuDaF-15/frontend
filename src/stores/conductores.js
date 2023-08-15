@@ -25,7 +25,7 @@ export const useConductorStore = defineStore("chofer", () => {
       });
       return datos;
     } catch (error) {
-      console.log(error);
+      throw error
     }
   };
 

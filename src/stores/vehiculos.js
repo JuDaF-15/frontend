@@ -26,6 +26,7 @@ export const useVehiculoStore = defineStore("vehiculo", () => {
             return datos;
         } catch (error) {
             console.log(error);
+            throw error
         }
     };
 
@@ -34,7 +35,8 @@ export const useVehiculoStore = defineStore("vehiculo", () => {
             let datos = await axios.post("http://localhost:4506/api/vehiculos", info)
             return datos
         } catch (error) {
-            throw(error);
+            console.log(error);
+            throw (error);
         }
     }
 
@@ -45,7 +47,8 @@ export const useVehiculoStore = defineStore("vehiculo", () => {
             })
             return datos
         } catch (error) {
-            throw(error);
+            console.log(error);
+            throw (error);
         }
     }
 

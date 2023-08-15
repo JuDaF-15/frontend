@@ -7,6 +7,7 @@ import Rutas from "../components/Rutas.vue"
 import Vendedores from "../components/Vendedores.vue"
 import Clientes from "../components/Clientes.vue"
 import Tiquetes from "../components/Tiquetes.vue"
+import Ventas from "../components/Ventas.vue"
 
 export const routes = [
     { path: "/", component: Login },
@@ -19,6 +20,7 @@ export const routes = [
             { path: "/vendedores", component: Vendedores },
             { path: "/clientes", component: Clientes },
             { path: "/tiquetes", component: Tiquetes },
+            { path: "/ventas", component: Ventas },
         ]
     },
     

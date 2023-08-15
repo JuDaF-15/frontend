@@ -12,6 +12,7 @@
                 </div>
             </div>
         </div><br><br>
+        <h5 style="margin-top: -15px;text-align: center;">Rutas</h5>
 
         <q-dialog v-model="alert">
             <q-card style="width: 32%;">
@@ -21,7 +22,7 @@
 
                 <q-card-section class="q-pt-none">
                     <div>
-                        <q-input outlined label="Código" v-model="codigoRuta" />
+                        <q-input outlined label="Código" type="number" v-model="codigoRuta" />
                         <q-input style="margin-top: 10px;" outlined label="Nombre" v-model="nombre" />
                         <q-input style="margin-top: 10px;" outlined label="Origen" v-model="origen" />
                         <q-input style="margin-top: 10px;" outlined label="Destino" v-model="destino" />
@@ -33,6 +34,7 @@
                         <q-btn v-if="bd == 1" style="margin-top: -10px;" label="Guardar" color="primary"
                             @click="registrar" />
                         <q-btn v-else style="margin-top: -10px;" label="Actualizar" color="primary" @click="actualizar" />
+                        <q-btn label="Cancelar" style="margin-top: -10px;" color="negative" v-close-popup />
                     </q-card-actions>
                 </q-card-section>
             </q-card>
@@ -213,7 +215,17 @@ async function registrar() {
             encontrado.value = data.value.filter(item => item.nombre.includes(nomRuta));
         }
     }).catch((error) => {
-        if (error.response && error.response.data && validarVacios() === true) {
+        if (error.response && error.response.data.mensaje) {
+            const repetida = error.response.data.mensaje
+            $q.notify({
+                message: repetida,
+                color: 'red',
+                position: 'top',
+                icon: 'warning',
+                timeout: Math.random() * 3000
+            })
+        }
+        else if (error.response && error.response.data && validarVacios() === true) {
             errores.value = error.response.data.errors[0].msg
             validar()
 
@@ -252,13 +264,24 @@ async function buscarNombre() {
         })
     } else {
         const nomRuta = nom.value.trim()
-        let res = await useRuta.traerRutaNombre(nomRuta)
-
-        encontrado.value = data.value.filter((item) =>
-            item.nombre.includes(nomRuta)
-        )
-        busquedaActiva.value = true
-        return res
+        await useRuta.traerRutaNombre(nomRuta)
+            .then((res) => {
+                encontrado.value = data.value.filter((item) =>
+                    item.nombre.includes(nomRuta)
+                )
+                busquedaActiva.value = true
+            }).catch((error) => {
+                if (error.response && error.response.data.mensaje) {
+                    const noEncontrado = error.response.data.mensaje
+                    $q.notify({
+                        message: noEncontrado,
+                        color: 'red',
+                        position: 'top',
+                        icon: 'warning',
+                        timeout: Math.random() * 3000
+                    })
+                }
+            })
     }
 }
 
@@ -324,7 +347,17 @@ async function actualizar() {
 
         }).catch((error) => {
             errores.value = '';
-            if (error.response && error.response.data && validarVacios() === true) {
+            if (error.response && error.response.data.mensaje) {
+                const repetida = error.response.data.mensaje
+                $q.notify({
+                    message: repetida,
+                    color: 'red',
+                    position: 'top',
+                    icon: 'warning',
+                    timeout: Math.random() * 3000
+                })
+            }
+            else if (error.response && error.response.data && validarVacios() === true) {
                 errores.value = error.response.data.errors[0].msg;
                 validar();
             } else {

@@ -10,6 +10,7 @@
                 <q-btn label="Buscar" icon="search" color="primary" @click="buscarCedula" />
             </div>
         </div><br><br>
+        <h5 style="margin-top: -15px;text-align: center;">Clientes</h5>
 
         <q-dialog v-model="alert">
             <q-card style="width: 32%;">
@@ -28,6 +29,7 @@
                         <q-btn v-if="bd == 1" style="margin-top: -10px;" label="Guardar" color="primary"
                             @click="registrar" />
                         <q-btn v-else style="margin-top: -10px;" label="Actualizar" color="primary" @click="actualizar" />
+                        <q-btn label="Cancelar" style="margin-top: -10px;" color="negative" v-close-popup />
                     </q-card-actions>
                 </q-card-section>
             </q-card>
@@ -189,10 +191,18 @@ async function registrar() {
             encontrado.value = data.value.filter(item => item.cedula.includes(cedulaPasa));
         }
     }).catch((error) => {
-        if (error.response && error.response.data && validarVacios() === true) {
+        if (error.response && error.response.data.mensaje) {
+            const repetida = error.response.data.mensaje
+            $q.notify({
+                message: repetida,
+                color: 'red',
+                position: 'top',
+                icon: 'warning',
+                timeout: Math.random() * 3000
+            })
+        } else if (error.response && error.response.data && validarVacios() === true) {
             errores.value = error.response.data.errors[0].msg
             validar()
-
         } else {
             console.log(error);
         }
@@ -228,13 +238,24 @@ async function buscarCedula() {
         })
     } else {
         const cedulaPasa = cc.value.trim()
-        let res = await useCliente.traerPasajeroCedula(cedulaPasa)
-
-        encontrado.value = data.value.filter((item) =>
-            item.cedula.includes(cedulaPasa)
-        )
-        busquedaActiva.value = true
-        return res
+        await useCliente.traerPasajeroCedula(cedulaPasa)
+            .then((res) => {
+                encontrado.value = data.value.filter((item) =>
+                    item.cedula.includes(cedulaPasa)
+                )
+                busquedaActiva.value = true
+            }).catch((error) => {
+                if (error.response && error.response.data.mensaje) {
+                    const noEncontrado = error.response.data.mensaje
+                    $q.notify({
+                        message: noEncontrado,
+                        color: 'red',
+                        position: 'top',
+                        icon: 'warning',
+                        timeout: Math.random() * 3000
+                    })
+                }
+            })
     }
 }
 
@@ -277,14 +298,22 @@ async function actualizar() {
             }
         }).catch((error) => {
             errores.value = ''
-            if (error.response && error.response.data && validarVacios() === true) {
+            if (error.response && error.response.data.mensaje) {
+                const repetida = error.response.data.mensaje
+                $q.notify({
+                    message: repetida,
+                    color: 'red',
+                    position: 'top',
+                    icon: 'warning',
+                    timeout: Math.random() * 3000
+                })
+            } else if (error.response && error.response.data && validarVacios() === true) {
                 errores.value = error.response.data.errors[0].msg
                 validar()
             } else {
                 console.log(error);
             }
         })
-
 }
 function vaciar() {
     cedula.value = ""
@@ -305,15 +334,15 @@ input {
 }
 
 .spinner-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(255, 255, 255, 0.8);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8);
 }
 
 .tabla {

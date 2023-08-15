@@ -1,17 +1,12 @@
 <template>
     <div>
         <div>
-            <q-btn label="Registrar Venta" color="primary" @click="alert = true" />
+            <q-btn label="Registrar Venta" icon="add" color="primary" @click="alert = true" />
         </div>
         <br /><br />
 
         <q-dialog v-model="alert">
             <q-card style="width: 32%;">
-                <div style="background-color: red;text-align: center;">
-                    <span v-if="msj !== ''">
-                        {{ msj }}
-                    </span>
-                </div>
 
                 <q-card-section>
                     <div class="text-h6">Registrar Venta</div>
@@ -52,16 +47,22 @@
                     <div class="img-wrapper">
                         <div class="img-container" v-for="i in selectedVehiculo.capacidad" :key="i">
                             <span class="seat-number">{{ i }}</span>
-                            <img class="asiento" src="imagenes/asiento.png" @click="venta(i)" />
+                            <img class="asiento"
+                                :class="{ 'asiento-seleccionado': i === puesto, 'asiento-comprado': asientoComprado.has(i) }"
+                                :style="{
+                                    'cursor': asientoComprado.has(i) ? 'not-allowed' : 'pointer',
+                                    'pointer-events': asientoComprado.has(i) ? 'none' : 'auto'
+                                }" src="imagenes/asiento.png" @click="venta(i)" />
                         </div>
                     </div>
                 </q-card>
             </div>
             <div class="col" v-if="mostrarVenta">
                 <p style="font-weight: bold;font-size: larger;">Asiento # {{ puesto }}</p>
-                <div>
-                    <q-btn color="primary" style="width: 100%;" @click="buscarCliente()">Buscar Cliente</q-btn>
-                </div>
+                <div style="display: flex;justify-content: center;gap: 20px;">
+                    <q-btn color="primary" @click="buscarCliente()">Buscar Cliente</q-btn>
+                    <q-btn color="primary">Guardar Cliente</q-btn>
+                </div><br>
 
                 <label>Cédula Cliente</label>
                 <input type="text" v-model="cedula">
@@ -73,7 +74,7 @@
                 <input type="text" v-model="nombre" :disabled="true">
 
                 <div style="margin-top: 10px;">
-                    <q-btn color="primary" style="width: 100%;" @click="guardarTiquete()">Confirmar</q-btn>
+                    <q-btn color="primary" style="width: 100%;" @click="guardarTiquete()">Confirmar Venta</q-btn>
                 </div>
             </div>
         </div>
@@ -86,12 +87,14 @@ import { useVehiculoStore } from "../stores/vehiculos.js";
 import { useRutaStore } from "../stores/rutas.js";
 import { useClienteStore } from "../stores/clientes.js";
 import { useTiqueteStore } from "../stores/tiquetes.js"
+import { useQuasar } from "quasar";
 
 
 const useVehiculo = useVehiculoStore();
 const useRuta = useRutaStore();
 const useCliente = useClienteStore();
 const useTiquetes = useTiqueteStore()
+const $q = useQuasar()
 let selectedRuta = ref("");
 let selectedVehiculo = ref("");
 
@@ -100,13 +103,15 @@ let ruta = ref("");
 let vehiculo = ref("");
 let puesto = ref();
 let fechaSalida = ref(new Date().toISOString().substr(0, 10));
-let msj = ref("")
 let ok = ref(false)
 let mostrarVenta = ref(false)
 let idCliente = ref("")
 let cedula = ref("")
 let telefono = ref("")
 let nombre = ref("")
+let comprado = ref("")
+let asientoComprado = ref(new Set());
+
 
 async function traerInfoRuta() {
     let res = await useRuta.traerRuta();
@@ -145,26 +150,45 @@ async function guardarTiquete() {
         num_acientos: puesto.value,
         fecha_salida: fechaSalida.value,
         tipo_pago: "Efectivo",
-        ruta: selectedRuta.value._id
+        ruta: selectedRuta.value._id,
+        estado: 1
     })
+    asientoComprado.value.add(puesto.value)
+    comprado.value = puesto.value;
     console.log(r);
 }
 
 function validar() {
     if (!selectedVehiculo.value) {
-        msj.value = "Seleccione el vehiculo"
+        $q.notify({
+            message: 'Seleccione el vehículo',
+            color: 'red',
+            icon: 'warning',
+            position: 'top',
+            timeout: Math.random() * 3000
+        })
     } else if (!selectedRuta.value) {
-        msj.value = "Seleccione la ruta"
+        $q.notify({
+            message: 'Seleccione la ruta',
+            color: 'red',
+            icon: 'warning',
+            position: 'top',
+            timeout: Math.random() * 3000
+        })
     } else if (!fechaSalida.value) {
-        msj.value = "Selecciona la fecha"
+        $q.notify({
+            message: 'Seleccione la fecha',
+            color: 'red',
+            icon: 'warning',
+            position: 'top',
+            timeout: Math.random() * 3000
+        })
     } else {
         alert.value = false
         return true
     }
-    setTimeout(() => {
-        msj.value = "";
-    }, 2000);
 }
+
 function guardar() {
     if (validar() === true) {
         ok.value = true
@@ -173,7 +197,16 @@ function guardar() {
 
 function venta(i) {
     puesto.value = i;
-    mostrarVenta.value = true
+    mostrarVenta.value = true;
+
+    // Limpiar los campos relacionados
+    idCliente.value = "";
+    cedula.value = "";
+    telefono.value = "";
+    nombre.value = "";
+
+    comprado.value = asientoComprado.has(i); // Actualizar el valor de 'comprado'
+
 }
 
 
@@ -187,6 +220,14 @@ function venta(i) {
     overflow-y: auto;
     max-height: 400px;
     width: 90%;
+}
+
+.asiento-seleccionado {
+    background-color: #ffa500;
+}
+
+.asiento-comprado {
+    background-color: red;
 }
 
 #card img {
@@ -269,7 +310,6 @@ input {
     color: #444;
     appearance: none;
 }
-
 
 input:focus {
     outline: none;

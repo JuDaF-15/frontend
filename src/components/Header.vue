@@ -97,6 +97,17 @@
               </q-item-section>
             </q-item>
 
+            <q-item clickable v-ripple>
+              <q-item-section avatar>
+                <i class="fa-solid fa-money-bill fa-xl"></i>
+              </q-item-section>
+
+              <q-item-section>
+                <router-link to="/ventas" style="text-decoration: none;color: black;">
+                  Ventas
+                </router-link>
+              </q-item-section>
+            </q-item>
           </q-list>
         </q-scroll-area>
 
