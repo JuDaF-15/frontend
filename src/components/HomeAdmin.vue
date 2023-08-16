@@ -2,6 +2,18 @@
   <div>
     <div class="q-pa-md row items-start q-gutter-md" id="cards">
       <div class="mostrar">
+
+        <q-card style="background-color: rgb(201, 225, 248);width: 200px;text-align: center;">
+          <q-card-section>
+            Cerrar Sesión
+          </q-card-section>
+          <div style="display: flex; justify-content: center;">
+            <router-link to="/">
+              <img src="imagenes/cerrar-sesion.png" style="width: 100px; height: 100px;">
+            </router-link>
+          </div>
+        </q-card>
+
         <q-card style="background-color: rgb(201, 225, 248);width: 200px;text-align: center;">
           <q-card-section>
             Conductores
@@ -67,6 +79,17 @@
             </router-link>
           </div>
         </q-card>
+
+        <q-card style="background-color: rgb(201, 225, 248);width: 200px;text-align: center;">
+          <q-card-section>
+            Ventas
+          </q-card-section>
+          <div style="display: flex; justify-content: center;">
+            <router-link to="/ventas">
+              <img src="imagenes/signo-de-dolar.png" style="width: 100px; height: 100px;">
+            </router-link>
+          </div>
+        </q-card>
       </div>
     </div>
   </div>
@@ -89,7 +112,7 @@
 
 .mostrar {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 100px;
 }
 </style>
