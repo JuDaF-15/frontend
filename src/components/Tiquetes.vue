@@ -74,7 +74,8 @@
                 <input type="text" v-model="nombre" :disabled="true">
 
                 <div style="margin-top: 10px;">
-                    <q-btn color="primary" style="width: 100%;" @click="guardarTiquete()" :disabled="!clienteEncontrado">Confirmar Venta</q-btn>
+                    <q-btn color="primary" style="width: 100%;" @click="guardarTiquete()"
+                        :disabled="!clienteEncontrado">Confirmar Venta</q-btn>
                 </div>
             </div>
         </div>
@@ -111,6 +112,7 @@ let cedula = ref("")
 let telefono = ref("")
 let nombre = ref("")
 let comprado = ref("")
+//let errores = ref([])
 let clienteEncontrado = ref(false);
 let asientoComprado = ref(new Set());
 
@@ -130,17 +132,29 @@ async function traerVehiculo() {
 
 traerVehiculo();
 
-
 async function buscarCliente() {
     let res = await useCliente.traerPasajeroCedula(cedula.value.toString())
-    console.log(res.data);
+        .then((res) => {
+            console.log(res.data);
 
-    idCliente.value = res.data._id
-    telefono.value = res.data.telefono
-    nombre.value = res.data.nombre
+            idCliente.value = res.data._id
+            telefono.value = res.data.telefono
+            nombre.value = res.data.nombre
 
-    clienteEncontrado.value = true;
-    
+            clienteEncontrado.value = true;
+        }).catch((error) => {
+            if (error.response && error.response.data.mensaje) {
+                const noEncontrado = error.response.data.mensaje
+                $q.notify({
+                    message: noEncontrado,
+                    color: 'red',
+                    position: 'top',
+                    icon: 'warning',
+                    timeout: Math.random() * 3000
+                })
+            }
+        })
+
 }
 
 
@@ -212,16 +226,16 @@ function venta(i) {
     cedula.value = "";
     telefono.value = "";
     nombre.value = "";
-    
+
     comprado.value = asientoComprado.has(i); // Actualizar el valor de 'comprado'
     clienteEncontrado.value = false
 }
 
 function generarTiquetePDF(numeroTiquete) {
     const doc = new jsPDF({
-        orientation: 'portrait', 
-        unit: 'mm',              
-        format: 'a6'             
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a6'
     });
 
     doc.setFont("helvetica", "bold");
