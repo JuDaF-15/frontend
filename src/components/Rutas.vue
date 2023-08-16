@@ -263,7 +263,7 @@ async function buscarNombre() {
             timeout: Math.random() * 3000
         })
     } else {
-        const nomRuta = nom.value.trim()
+        const nomRuta = nom.value.trim().toUpperCase()
         await useRuta.traerRutaNombre(nomRuta)
             .then((res) => {
                 encontrado.value = data.value.filter((item) =>

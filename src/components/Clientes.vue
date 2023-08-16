@@ -6,7 +6,7 @@
             </div>
             <div class="col" style="display: flex;justify-content: flex-end;align-items:center;">
                 <div @click="limpiarBusqueda" style="cursor: pointer;">🗑️</div>
-                <input type="text" placeholder="Cédula" v-model="cc">
+                <input type="number" placeholder="Cédula" v-model="cc">
                 <q-btn label="Buscar" icon="search" color="primary" @click="buscarCedula" />
             </div>
         </div><br><br>
@@ -228,7 +228,7 @@ function limpiarBusqueda() {
 }
 
 async function buscarCedula() {
-    if (cc.value.trim() == "") {
+    if (cc.value == "") {
         $q.notify({
             message: 'Introduzca la cédula a buscar',
             color: 'red',
@@ -237,7 +237,7 @@ async function buscarCedula() {
             timeout: Math.random() * 3000
         })
     } else {
-        const cedulaPasa = cc.value.trim()
+        const cedulaPasa = cc.value.toString()
         await useCliente.traerPasajeroCedula(cedulaPasa)
             .then((res) => {
                 encontrado.value = data.value.filter((item) =>

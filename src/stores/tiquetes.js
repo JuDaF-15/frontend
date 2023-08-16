@@ -2,7 +2,6 @@ import { defineStore } from "pinia"
 import axios from "axios"
 
 export const useTiqueteStore = defineStore("tiquete", () => {
-    let data = ""
 
     const traerTiquete = async (info) => {
         try {
@@ -12,6 +11,17 @@ export const useTiqueteStore = defineStore("tiquete", () => {
             console.log(error);
         }
     }
+    const traerTiqueteNumero = async (numero) => {
+        try {
+            let datos = await axios.get(`http://localhost:4506/api/tiketes/${numero}`, {
+                params: { numero: numero }
+            });
+            return datos;
+        } catch (error) {
+            console.log(error);
+            throw error
+        }
+    };
 
     const postTiquete = async (info) => {
         try {
@@ -23,6 +33,6 @@ export const useTiqueteStore = defineStore("tiquete", () => {
     }
 
     return {
-        traerTiquete, postTiquete
+        traerTiquete, postTiquete,traerTiqueteNumero
     }
 })

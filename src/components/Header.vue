@@ -4,9 +4,9 @@
       <q-header elevated style="background-color: rgba(96, 4, 119, 0.753);">
         <q-toolbar>
           <q-toolbar-title>TRANSPORTES S.A.S</q-toolbar-title>
+          <q-btn to="/" flat @click="drawer = !drawer" round dense icon="fa-solid fa-right-from-bracket" />
           <q-btn flat @click="drawer = !drawer" round dense icon="fa-solid fa-bars" />
         </q-toolbar>
-
       </q-header>
 
       <q-drawer v-model="drawer" show-if-above :width="200" :breakpoint="400">
@@ -75,7 +75,7 @@
 
             <q-item clickable v-ripple>
               <q-item-section avatar>
-                <i class="fa-solid fa-city fa-xl"></i>
+                <i class="fa-solid fa-route fa-xl"></i>
               </q-item-section>
 
               <q-item-section>

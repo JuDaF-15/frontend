@@ -65,7 +65,7 @@
                 </div><br>
 
                 <label>Cédula Cliente</label>
-                <input type="text" v-model="cedula">
+                <input type="number" v-model="cedula">
 
                 <label>Teléfono</label>
                 <input type="text" v-model="telefono" :disabled="true">
@@ -74,7 +74,7 @@
                 <input type="text" v-model="nombre" :disabled="true">
 
                 <div style="margin-top: 10px;">
-                    <q-btn color="primary" style="width: 100%;" @click="guardarTiquete()">Confirmar Venta</q-btn>
+                    <q-btn color="primary" style="width: 100%;" @click="guardarTiquete()" :disabled="!clienteEncontrado">Confirmar Venta</q-btn>
                 </div>
             </div>
         </div>
@@ -88,6 +88,7 @@ import { useRutaStore } from "../stores/rutas.js";
 import { useClienteStore } from "../stores/clientes.js";
 import { useTiqueteStore } from "../stores/tiquetes.js"
 import { useQuasar } from "quasar";
+import jsPDF from "jspdf";
 
 
 const useVehiculo = useVehiculoStore();
@@ -110,8 +111,8 @@ let cedula = ref("")
 let telefono = ref("")
 let nombre = ref("")
 let comprado = ref("")
+let clienteEncontrado = ref(false);
 let asientoComprado = ref(new Set());
-
 
 async function traerInfoRuta() {
     let res = await useRuta.traerRuta();
@@ -131,19 +132,23 @@ traerVehiculo();
 
 
 async function buscarCliente() {
-    let res = await useCliente.traerPasajeroCedula(cedula.value)
+    let res = await useCliente.traerPasajeroCedula(cedula.value.toString())
     console.log(res.data);
 
     idCliente.value = res.data._id
     telefono.value = res.data.telefono
     nombre.value = res.data.nombre
+
+    clienteEncontrado.value = true;
+    
 }
 
-/* numero, vehiculo_matricula, empleado, cedula_pasajero, num_acientos, fecha_salida, hora_salida, tipo_pago, ruta, estado */
 
 async function guardarTiquete() {
+    const numeroTiquete = Math.floor(Math.random() * 900000) + 100000;
+
     let r = await useTiquetes.postTiquete({
-        numero: Math.floor(Math.random() * 900000) + 100000,
+        numero: numeroTiquete,
         vehiculo_matricula: selectedVehiculo.value._id,
         empleado: "64cc0467ca96b9c2e8cb2044",
         cedula_pasajero: idCliente.value,
@@ -155,6 +160,8 @@ async function guardarTiquete() {
     })
     asientoComprado.value.add(puesto.value)
     comprado.value = puesto.value;
+    generarTiquetePDF(numeroTiquete)
+    clienteEncontrado.value = false
     console.log(r);
 }
 
@@ -195,6 +202,7 @@ function guardar() {
     }
 }
 
+
 function venta(i) {
     puesto.value = i;
     mostrarVenta.value = true;
@@ -204,9 +212,47 @@ function venta(i) {
     cedula.value = "";
     telefono.value = "";
     nombre.value = "";
-
+    
     comprado.value = asientoComprado.has(i); // Actualizar el valor de 'comprado'
+    clienteEncontrado.value = false
+}
 
+function generarTiquetePDF(numeroTiquete) {
+    const doc = new jsPDF({
+        orientation: 'portrait', 
+        unit: 'mm',              
+        format: 'a6'             
+    });
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("Tiquete de Venta", doc.internal.pageSize.getWidth() / 2, 15, { align: "center" });
+
+    doc.setFont("helvetica", "normal");
+
+    // Información de ruta, vehículo y hora de salida
+    doc.setFontSize(12);
+    doc.text(`Número: ${numeroTiquete}`, 20, 30);
+    doc.text(`Origen: ${selectedRuta.value.origen}`, 20, 40);
+    doc.text(`Destino: ${selectedRuta.value.destino}`, 20, 50);
+    doc.text(`Vehículo: ${selectedVehiculo.value.matricula}`, 20, 60);
+    doc.text(`Fecha de Salida: ${fechaSalida.value}`, 20, 70);
+    doc.text(`Hora de Salida: ${selectedRuta.value.hora_salida}`, 20, 80);
+
+    // Línea separadora
+    doc.setLineWidth(0.5);
+    doc.line(20, 90, doc.internal.pageSize.getWidth() - 20, 90);
+
+    // Información del cliente
+    doc.setFontSize(12);
+    doc.text(`Pasajero: ${nombre.value}`, 20, 100);
+    doc.text(`Cédula: ${cedula.value}`, 20, 110);
+    doc.text(`Teléfono: ${telefono.value}`, 20, 120);
+    doc.text(`Asiento: ${puesto.value}`, 20, 130);
+    doc.text(`Valor: ${selectedRuta.value.valor}`, 20, 140);
+
+    // Guardar el documento como un archivo PDF
+    doc.save("tiquete.pdf");
 }
 
 

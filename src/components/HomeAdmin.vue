@@ -80,6 +80,13 @@
   height: 100%;
 }
 
+.q-card{
+  transition: transform 0.3s ease-in-out;
+}
+.q-card:hover {
+  transform: scale(1.10);
+}
+
 .mostrar {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

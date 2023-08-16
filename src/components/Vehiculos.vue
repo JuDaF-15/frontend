@@ -275,7 +275,7 @@ async function buscarMatricula() {
       timeout: Math.random() * 3000
     })
   } else {
-    const matVeh = mat.value.trim()
+    const matVeh = mat.value.trim().split(" ").join("")
     await useVehiculo.traerVehiculoMatricula(matVeh)
       .then((res) => {
         encontrado.value = data.value.filter((item) =>
