@@ -1,5 +1,8 @@
 <template>
     <div>
+        <div class="spinner-container" v-if="useTiquete.loading == true">
+            <q-spinner style="margin-left: 10px;" color="black" size="5em" :thickness="10" />
+        </div>
         <div class="row">
             <div class="col">
             </div>
@@ -105,7 +108,7 @@
 <script setup>
 import { useTiqueteStore } from "../stores/tiquetes.js"
 import { ref } from "vue"
-import {useQuasar} from "quasar"
+import { useQuasar } from "quasar"
 import jsPDF from "jspdf";
 
 
@@ -204,6 +207,18 @@ input {
     margin-bottom: 10px;
     border-radius: 5px;
     margin: 0;
+}
+
+.spinner-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
 }
 
 .tabla {
