@@ -144,7 +144,7 @@ function generarTiquete(tiquete) {
     doc.text(`Número: ${tiquete.numero}`, 20, 30);
     doc.text(`Origen: ${tiquete.ruta.origen}`, 20, 40);
     doc.text(`Destino: ${tiquete.ruta.destino}`, 20, 50);
-    doc.text(`Vehículo: ${tiquete.vehiculo_matricula.matricula}`, 20, 60);
+    doc.text(`Vehículo: ${tiquete.vehiculo_matricula.matricula} / ${tiquete.vehiculo_matricula.numero} `, 20, 60);
     doc.text(`Fecha de Salida: ${tiquete.fecha_salida}`, 20, 70);
     doc.text(`Hora de Salida: ${tiquete.ruta.hora_salida}`, 20, 80);
 
@@ -210,15 +210,15 @@ input {
 }
 
 .spinner-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(255, 255, 255, 0.8);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8);
 }
 
 .tabla {

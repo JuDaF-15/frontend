@@ -40,10 +40,10 @@ export const useVehiculoStore = defineStore("vehiculo", () => {
         }
     }
 
-    const actualizarVehiculo = async (id, matricula, chofer_id, tipo, marca, modelo, capacidad) => {
+    const actualizarVehiculo = async (id, matricula, numero, chofer_id, tipo, marca, modelo, capacidad) => {
         try {
             let datos = await axios.put(`http://localhost:4506/api/vehiculos/${id}`, {
-                matricula, chofer_id, tipo, marca, modelo, capacidad
+                matricula, numero, chofer_id, tipo, marca, modelo, capacidad
             })
             return datos
         } catch (error) {

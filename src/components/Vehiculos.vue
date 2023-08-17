@@ -20,6 +20,7 @@
         <q-card-section class="q-pt-none" style="overflow-x:hidden;">
           <div>
             <q-input outlined label="Matrícula" v-model="matricula" />
+            <q-input style="margin-top: 10px;" type="number" outlined label="Número" v-model="numero" />
             <q-select label="Conductor" outlined style="width: auto;margin-top: 10px;" v-model="c"
               :options="conduc.map(conductor => ({ label: conductor.nombre, value: conductor._id }))" emit-value
               map-options>
@@ -48,6 +49,7 @@
         <thead>
           <tr>
             <th>Matricula</th>
+            <th>Número</th>
             <th>Conductor</th>
             <th>Tipo</th>
             <th>Marca</th>
@@ -60,6 +62,7 @@
         <tbody>
           <tr v-for="vehiculo in data" :key="vehiculo.matricula">
             <td>{{ vehiculo.matricula }}</td>
+            <td>{{ vehiculo.numero }}</td>
             <td>{{ vehiculo.chofer_id.nombre }}</td>
             <td>{{ vehiculo.tipo }}</td>
             <td>{{ vehiculo.marca }}</td>
@@ -87,6 +90,7 @@
         <thead>
           <tr>
             <th>Matricula</th>
+            <th>Número</th>
             <th>Conductor</th>
             <th>Tipo</th>
             <th>Marca</th>
@@ -99,6 +103,7 @@
         <tbody>
           <tr v-for="vehiculo in encontrado" :key="vehiculo.matricula">
             <td>{{ vehiculo.matricula }}</td>
+            <td>{{ vehiculo.numero }}</td>
             <td>{{ vehiculo.chofer_id.nombre }}</td>
             <td>{{ vehiculo.tipo }}</td>
             <td>{{ vehiculo.marca }}</td>
@@ -136,6 +141,7 @@ const useVehiculo = useVehiculoStore()
 const useConductor = useConductorStore()
 
 let matricula = ref("")
+let numero = ref("")
 let tipo = ref("")
 let marca = ref("")
 let modelo = ref("")
@@ -176,7 +182,7 @@ async function traer() {
 }
 
 function validarVacios() {
-  if (matricula.value === "" && c.value === "" && tipo.value === "" && marca.value === "" && modelo.value === ""
+  if (matricula.value === "" && numero.value === "" && c.value === "" && tipo.value === "" && marca.value === "" && modelo.value === ""
     && capacidad.value === "") {
     $q.notify({
       message: 'Campos vacíos',
@@ -201,6 +207,7 @@ function validar() {
 async function registrar() {
   let res = await useVehiculo.registrarVehiculo({
     matricula: matricula.value.split(" ").join(""),
+    numero: numero.value,
     chofer_id: c.value,
     tipo: tipo.value,
     marca: marca.value,
@@ -302,6 +309,7 @@ function editarVehiculo(vehiculo) {
   bd.value = 0
   id.value = vehiculo._id
   matricula.value = vehiculo.matricula
+  numero.value = vehiculo.numero
   c.value = vehiculo.chofer_id._id
   tipo.value = vehiculo.tipo
   marca.value = vehiculo.marca
@@ -312,7 +320,7 @@ function editarVehiculo(vehiculo) {
 }
 
 async function actualizar() {
-  const res = await useVehiculo.actualizarVehiculo(id.value, matricula.value.split(" ").join(""), c.value, tipo.value,
+  const res = await useVehiculo.actualizarVehiculo(id.value, matricula.value.split(" ").join(""), numero.value, c.value, tipo.value,
     marca.value, modelo.value, capacidad.value)
     .then((res) => {
       console.log(res);
@@ -322,6 +330,7 @@ async function actualizar() {
       const indexActualizado = data.value.findIndex((vehiculos) => vehiculos._id === id.value);
       if (indexActualizado !== -1) {
         data.value[indexActualizado].matricula = matricula.value.split(" ").join("");
+        data.value[indexActualizado].numero = numero.value
         data.value[indexActualizado].chofer_id._id = c.value
         data.value[indexActualizado].tipo = tipo.value
         data.value[indexActualizado].marca = marca.value
@@ -339,6 +348,7 @@ async function actualizar() {
       const indexActualizadoEncontrado = encontrado.value.findIndex((vehiculos) => vehiculos._id === id.value);
       if (indexActualizadoEncontrado !== -1) {
         encontrado.value[indexActualizadoEncontrado].matricula = matricula.value;
+        encontrado.value[indexActualizadoEncontrado].numero = numero.value
         encontrado.value[indexActualizadoEncontrado].chofer_id._id = c.value
         encontrado.value[indexActualizadoEncontrado].tipo = tipo.value
         encontrado.value[indexActualizadoEncontrado].marca = marca.value
@@ -370,6 +380,7 @@ async function actualizar() {
 
 function vaciar() {
   matricula.value = ""
+  numero.value = ""
   c.value = ""
   tipo.value = ""
   marca.value = ""

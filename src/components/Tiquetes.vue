@@ -5,6 +5,27 @@
         </div>
         <br /><br />
 
+        <q-dialog v-model="paraAgregar">
+            <q-card style="width: 32%;">
+                <q-card-section>
+                    <div class="text-h6">Registrar Cliente</div>
+                </q-card-section>
+
+                <q-card-section class="q-pt-none">
+                    <div>
+                        <q-input outlined label="Cédula" type="number" v-model="cedulaNueva" />
+                        <q-input style="margin-top: 10px;" outlined label="Nombre" v-model="nombreNuevo" />
+                        <q-input style="margin-top: 10px;" outlined label="Teléfono" v-model="telefonoNuevo" />
+                    </div><br>
+
+                    <q-card-actions align="right">
+                        <q-btn style="margin-top: -10px;" label="Guardar" color="primary" @click="registrar" />
+                        <q-btn label="Cancelar" style="margin-top: -10px;" color="negative" v-close-popup />
+                    </q-card-actions>
+                </q-card-section>
+            </q-card>
+        </q-dialog>
+
         <q-dialog v-model="alert">
             <q-card style="width: 32%;">
 
@@ -16,15 +37,15 @@
                     <div class="select-wrapper">
                         <label>Ruta:</label>
                         <select v-model="selectedRuta" id="rutaSelect">
-                            <option v-for="option in ruta" :value="option" :key="option.id">
-                                {{ option.nombre }} / Hora: {{ option.hora_salida }}
+                            <option v-for="option in rutasActivas" :value="option" :key="option.id">
+                                {{ option.origen }} - {{ option.destino }} / Hora: {{ option.hora_salida }}
                             </option>
                         </select>
 
                         <label>Vehículo:</label>
                         <select v-model="selectedVehiculo" id="vehiculoSelect">
-                            <option v-for="option in vehiculo" :value="option" :key="option.id">
-                                {{ option.matricula }}
+                            <option v-for="option in vehiculosActivos" :value="option" :key="option.id">
+                                {{ option.numero }} / {{ option.matricula }}
                             </option>
                         </select>
 
@@ -61,7 +82,7 @@
                 <p style="font-weight: bold;font-size: larger;">Asiento # {{ puesto }}</p>
                 <div style="display: flex;justify-content: center;gap: 20px;">
                     <q-btn color="primary" @click="buscarCliente()">Buscar Cliente</q-btn>
-                    <q-btn color="primary">Guardar Cliente</q-btn>
+                    <q-btn color="primary" @click="paraAgregar = true">Guardar Cliente</q-btn>
                 </div><br>
 
                 <label>Cédula Cliente</label>
@@ -83,7 +104,7 @@
 </template>
   
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useVehiculoStore } from "../stores/vehiculos.js";
 import { useRutaStore } from "../stores/rutas.js";
 import { useClienteStore } from "../stores/clientes.js";
@@ -101,6 +122,7 @@ let selectedRuta = ref("");
 let selectedVehiculo = ref("");
 
 let alert = ref(false);
+let paraAgregar = ref(false)
 let ruta = ref("");
 let vehiculo = ref("");
 let puesto = ref();
@@ -112,9 +134,22 @@ let cedula = ref("")
 let telefono = ref("")
 let nombre = ref("")
 let comprado = ref("")
-//let errores = ref([])
+let errores = ref([])
+let data = ref([])
 let clienteEncontrado = ref(false);
 let asientoComprado = ref(new Set());
+
+let cedulaNueva = ref("")
+let telefonoNuevo = ref("")
+let nombreNuevo = ref("")
+
+const vehiculosActivos = computed(() => {
+    return vehiculo.value.filter(v => v.estado === 1);
+});
+
+const rutasActivas = computed(() => {
+    return ruta.value.filter(r => r.estado === 1);
+});
 
 async function traerInfoRuta() {
     let res = await useRuta.traerRuta();
@@ -135,13 +170,33 @@ traerVehiculo();
 async function buscarCliente() {
     let res = await useCliente.traerPasajeroCedula(cedula.value.toString())
         .then((res) => {
-            console.log(res.data);
+            if (cedula.value == "") {
+                $q.notify({
+                    message: "Introduzca la cédula del cliente",
+                    color: 'red',
+                    position: 'top',
+                    icon: 'warning',
+                    timeout: Math.random() * 3000
+                })
+            }
+            else if (res.data.estado === 0) {
+                $q.notify({
+                    message: "El cliente está inactivo",
+                    color: 'red',
+                    position: 'top',
+                    icon: 'warning',
+                    timeout: Math.random() * 3000
+                })
+            } else {
+                console.log(res.data);
 
-            idCliente.value = res.data._id
-            telefono.value = res.data.telefono
-            nombre.value = res.data.nombre
+                idCliente.value = res.data._id
+                telefono.value = res.data.telefono
+                nombre.value = res.data.nombre
 
-            clienteEncontrado.value = true;
+                clienteEncontrado.value = true;
+            }
+
         }).catch((error) => {
             if (error.response && error.response.data.mensaje) {
                 const noEncontrado = error.response.data.mensaje
@@ -177,6 +232,72 @@ async function guardarTiquete() {
     generarTiquetePDF(numeroTiquete)
     clienteEncontrado.value = false
     console.log(r);
+}
+
+function validarVacios() {
+    if (cedulaNueva.value === "" && nombreNuevo.value === "" && telefonoNuevo.value === "") {
+        $q.notify({
+            message: 'Campos vacíos',
+            color: 'red',
+            icon: 'warning',
+            position: 'top',
+            timeout: Math.random() * 3000
+        })
+    } else return true
+}
+
+function vaciar() {
+    cedulaNueva.value = ""
+    nombreNuevo.value = ""
+    telefonoNuevo.value = ""
+}
+function validarCliente() {
+    $q.notify({
+        message: errores,
+        color: 'red',
+        position: 'top',
+        icon: 'warning',
+        timeout: Math.random() * 3000
+    })
+}
+async function registrar() {
+    let res = await useCliente.registrarCliente({
+        cedula: cedulaNueva.value,
+        nombre: nombreNuevo.value,
+        telefono: telefonoNuevo.value
+    }).then((res) => {
+        paraAgregar.value = false
+        vaciar()
+
+        if (data) {
+            data.value.unshift(res.data.pasajero);
+        }
+
+        $q.notify({
+            message: 'Cliente agregado exitosamente',
+            color: 'green',
+            position: 'top',
+            icon: 'check',
+            timeout: Math.random() * 3000
+        })
+
+    }).catch((error) => {
+        if (error.response && error.response.data.mensaje) {
+            const repetida = error.response.data.mensaje
+            $q.notify({
+                message: repetida,
+                color: 'red',
+                position: 'top',
+                icon: 'warning',
+                timeout: Math.random() * 3000
+            })
+        } else if (error.response && error.response.data && validarVacios() === true) {
+            errores.value = error.response.data.errors[0].msg
+            validarCliente()
+        } else {
+            console.log(error);
+        }
+    })
 }
 
 function validar() {
@@ -249,7 +370,7 @@ function generarTiquetePDF(numeroTiquete) {
     doc.text(`Número: ${numeroTiquete}`, 20, 30);
     doc.text(`Origen: ${selectedRuta.value.origen}`, 20, 40);
     doc.text(`Destino: ${selectedRuta.value.destino}`, 20, 50);
-    doc.text(`Vehículo: ${selectedVehiculo.value.matricula}`, 20, 60);
+    doc.text(`Vehículo: ${selectedVehiculo.value.matricula} / ${selectedVehiculo.value.numero}`, 20, 60);
     doc.text(`Fecha de Salida: ${fechaSalida.value}`, 20, 70);
     doc.text(`Hora de Salida: ${selectedRuta.value.hora_salida}`, 20, 80);
 
