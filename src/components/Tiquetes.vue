@@ -143,19 +143,21 @@ let cedulaNueva = ref("")
 let telefonoNuevo = ref("")
 let nombreNuevo = ref("")
 
+const rutasActivas = computed(() => {
+    return ruta.value.filter(r => r.estado === 1);
+});
+
 const vehiculosActivos = computed(() => {
     return vehiculo.value.filter(v => v.estado === 1);
 });
 
-const rutasActivas = computed(() => {
-    return ruta.value.filter(r => r.estado === 1);
-});
 
 async function traerInfoRuta() {
     let res = await useRuta.traerRuta();
     console.log(res);
     ruta.value = res.data.ruta;
 }
+
 
 traerInfoRuta();
 
@@ -164,6 +166,7 @@ async function traerVehiculo() {
     vehiculo.value = res.data.vehiculo;
     console.log(vehiculo.value);
 }
+
 
 traerVehiculo();
 
@@ -219,7 +222,7 @@ async function guardarTiquete() {
     let r = await useTiquetes.postTiquete({
         numero: numeroTiquete,
         vehiculo_matricula: selectedVehiculo.value._id,
-        empleado: "64cc0467ca96b9c2e8cb2044",
+        empleado: "64d910b70532bf573d0a047a",
         cedula_pasajero: idCliente.value,
         num_acientos: puesto.value,
         fecha_salida: fechaSalida.value,
