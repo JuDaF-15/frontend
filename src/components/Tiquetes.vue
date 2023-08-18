@@ -73,7 +73,7 @@
                                 :style="{
                                     'cursor': asientoComprado.has(i) ? 'not-allowed' : 'pointer',
                                     'pointer-events': asientoComprado.has(i) ? 'none' : 'auto'
-                                }" src="imagenes/asiento.png" @click="venta(i)" />
+                                }" src="../imagenes/asiento.png" @click="venta(i)" />
                         </div>
                     </div>
                 </q-card>

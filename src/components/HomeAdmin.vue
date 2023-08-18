@@ -9,7 +9,7 @@
           </q-card-section>
           <div style="display: flex; justify-content: center;">
             <router-link to="/">
-              <img src="imagenes/cerrar-sesion.png" style="width: 100px; height: 100px;">
+              <img src="../imagenes/cerrar-sesion.png" style="width: 100px; height: 100px;">
             </router-link>
           </div>
         </q-card>
@@ -20,7 +20,7 @@
           </q-card-section>
           <div style="display: flex; justify-content: center;">
             <router-link to="/conductores">
-              <img src="imagenes/licencia-de-conducir.png" style="width: 100px; height: 100px;">
+              <img src="../imagenes/licencia-de-conducir.png" style="width: 100px; height: 100px;">
             </router-link>
           </div>
         </q-card>
@@ -31,7 +31,7 @@
           </q-card-section>
           <div style="display: flex; justify-content: center;">
             <router-link to="/vendedores">
-              <img src="imagenes/vendedora.png" style="width: 100px; height: 100px;">
+              <img src="../imagenes/vendedora.png" style="width: 100px; height: 100px;">
             </router-link>
           </div>
         </q-card>
@@ -42,7 +42,7 @@
           </q-card-section>
           <div style="display: flex; justify-content: center;">
             <router-link to="/vehiculos">
-              <img src="imagenes/autobus.png" style="width: 100px; height: 100px;">
+              <img src="../imagenes/autobus.png" style="width: 100px; height: 100px;">
             </router-link>
           </div>
         </q-card>
@@ -53,7 +53,7 @@
           </q-card-section>
           <div style="display: flex; justify-content: center;">
             <router-link to="/rutas">
-              <img src="imagenes/ruta.png" style="width: 100px; height: 100px;">
+              <img src="../imagenes/ruta.png" style="width: 100px; height: 100px;">
             </router-link>
           </div>
         </q-card>
@@ -64,7 +64,7 @@
           </q-card-section>
           <div style="display: flex; justify-content: center;">
             <router-link to="/clientes">
-              <img src="imagenes/clientes.png" style="width: 100px; height: 100px;">
+              <img src="../imagenes/clientes.png" style="width: 100px; height: 100px;">
             </router-link>
           </div>
         </q-card>
@@ -75,7 +75,7 @@
           </q-card-section>
           <div style="display: flex; justify-content: center;">
             <router-link to="/tiquetes">
-              <img src="imagenes/factura.png" style="width: 100px; height: 100px;">
+              <img src="../imagenes/factura.png" style="width: 100px; height: 100px;">
             </router-link>
           </div>
         </q-card>
@@ -86,7 +86,7 @@
           </q-card-section>
           <div style="display: flex; justify-content: center;">
             <router-link to="/ventas">
-              <img src="imagenes/signo-de-dolar.png" style="width: 100px; height: 100px;">
+              <img src="../imagenes/signo-de-dolar.png" style="width: 100px; height: 100px;">
             </router-link>
           </div>
         </q-card>
