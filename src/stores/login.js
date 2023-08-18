@@ -10,6 +10,7 @@ export const useLoginStore = defineStore("login", () => {
       loading.value = true
       let datos = await axios.post("https://transporte-qdpu.onrender.com/api/logins/login",
         { username: username, clave: clave });
+        console.log(datos);
       return datos;
     } catch (error) {
       loading.value = true
