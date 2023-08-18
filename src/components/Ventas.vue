@@ -141,22 +141,22 @@ function generarTiquete(tiquete) {
     doc.setFont("helvetica", "normal");
 
     doc.setFontSize(12);
-    doc.text(`Número: ${tiquete.numero}`, 20, 30);
-    doc.text(`Origen: ${tiquete.ruta.origen}`, 20, 40);
-    doc.text(`Destino: ${tiquete.ruta.destino}`, 20, 50);
-    doc.text(`Vehículo: ${tiquete.vehiculo_matricula.matricula} / ${tiquete.vehiculo_matricula.numero} `, 20, 60);
-    doc.text(`Fecha de Salida: ${tiquete.fecha_salida}`, 20, 70);
-    doc.text(`Hora de Salida: ${tiquete.ruta.hora_salida}`, 20, 80);
+    doc.text(`Número: ${tiquete.numero}`, 10, 30);
+    doc.text(`Origen: ${tiquete.ruta.origen}`, 10, 40);
+    doc.text(`Destino: ${tiquete.ruta.destino}`, 10, 50);
+    doc.text(`Vehículo: ${tiquete.vehiculo_matricula.matricula} / ${tiquete.vehiculo_matricula.numero} `, 10, 60);
+    doc.text(`Fecha de Salida: ${tiquete.fecha_salida}`, 10, 70);
+    doc.text(`Hora de Salida: ${tiquete.ruta.hora_salida}`, 10, 80);
 
     doc.setLineWidth(0.5);
-    doc.line(20, 90, doc.internal.pageSize.getWidth() - 20, 90);
+    doc.line(10, 90, doc.internal.pageSize.getWidth() - 10, 90);
 
     doc.setFontSize(12);
-    doc.text(`Pasajero: ${tiquete.cedula_pasajero.nombre}`, 20, 100);
-    doc.text(`Cédula: ${tiquete.cedula_pasajero.cedula}`, 20, 110);
-    doc.text(`Teléfono: ${tiquete.cedula_pasajero.telefono}`, 20, 120);
-    doc.text(`Asiento: ${tiquete.num_acientos}`, 20, 130);
-    doc.text(`Valor: ${tiquete.ruta.valor}`, 20, 140);
+    doc.text(`Pasajero: ${tiquete.cedula_pasajero.nombre}`, 10, 100);
+    doc.text(`Cédula: ${tiquete.cedula_pasajero.cedula}`, 10, 110);
+    doc.text(`Teléfono: ${tiquete.cedula_pasajero.telefono}`, 10, 120);
+    doc.text(`Asiento: ${tiquete.num_acientos}`, 10, 130);
+    doc.text(`Valor: ${tiquete.ruta.valor}`, 10, 140);
 
     doc.save("tiquete.pdf");
 }

@@ -369,24 +369,24 @@ function generarTiquetePDF(numeroTiquete) {
 
     // Información de ruta, vehículo y hora de salida
     doc.setFontSize(12);
-    doc.text(`Número: ${numeroTiquete}`, 20, 30);
-    doc.text(`Origen: ${selectedRuta.value.origen}`, 20, 40);
-    doc.text(`Destino: ${selectedRuta.value.destino}`, 20, 50);
-    doc.text(`Vehículo: ${selectedVehiculo.value.matricula} / ${selectedVehiculo.value.numero}`, 20, 60);
-    doc.text(`Fecha de Salida: ${fechaSalida.value}`, 20, 70);
-    doc.text(`Hora de Salida: ${selectedRuta.value.hora_salida}`, 20, 80);
+    doc.text(`Número: ${numeroTiquete}`, 10, 30);
+    doc.text(`Origen: ${selectedRuta.value.origen}`, 10, 40);
+    doc.text(`Destino: ${selectedRuta.value.destino}`, 10, 50);
+    doc.text(`Vehículo: ${selectedVehiculo.value.matricula} / ${selectedVehiculo.value.numero}`, 10, 60);
+    doc.text(`Fecha de Salida: ${fechaSalida.value}`, 10, 70);
+    doc.text(`Hora de Salida: ${selectedRuta.value.hora_salida}`, 10, 80);
 
     // Línea separadora
     doc.setLineWidth(0.5);
-    doc.line(20, 90, doc.internal.pageSize.getWidth() - 20, 90);
+    doc.line(20, 90, doc.internal.pageSize.getWidth() - 10, 90);
 
     // Información del cliente
     doc.setFontSize(12);
-    doc.text(`Pasajero: ${nombre.value}`, 20, 100);
-    doc.text(`Cédula: ${cedula.value}`, 20, 110);
-    doc.text(`Teléfono: ${telefono.value}`, 20, 120);
-    doc.text(`Asiento: ${puesto.value}`, 20, 130);
-    doc.text(`Valor: ${selectedRuta.value.valor}`, 20, 140);
+    doc.text(`Pasajero: ${nombre.value}`, 10, 100);
+    doc.text(`Cédula: ${cedula.value}`, 10, 110);
+    doc.text(`Teléfono: ${telefono.value}`, 10, 120);
+    doc.text(`Asiento: ${puesto.value}`, 10, 130);
+    doc.text(`Valor: ${selectedRuta.value.valor}`, 10, 140);
 
     // Guardar el documento como un archivo PDF
     doc.save("tiquete.pdf");
