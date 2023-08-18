@@ -165,7 +165,9 @@ const rutasActivas = computed(() => {
 
 const vehiculosActivos = computed(() => {
     return vehiculo.value.filter(v => v.estado === 1);
+    
 }); 
+
 
 async function buscarCliente() {
     let res = await useCliente.traerPasajeroCedula(cedula.value.toString())
