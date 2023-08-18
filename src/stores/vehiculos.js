@@ -8,7 +8,7 @@ export const useVehiculoStore = defineStore("vehiculo", () => {
     const traerVehiculo = async (info) => {
         try {
             loading.value = true
-            let datos = await axios.get("http://localhost:4506/api/vehiculos", info)
+            let datos = await axios.get("https://transporte-qdpu.onrender.com/api/vehiculos", info)
             return datos
         } catch (error) {
             loading.value = true
@@ -20,7 +20,7 @@ export const useVehiculoStore = defineStore("vehiculo", () => {
 
     const traerVehiculoMatricula = async (matricula) => {
         try {
-            let datos = await axios.get(`http://localhost:4506/api/vehiculos/${matricula}`, {
+            let datos = await axios.get(`https://transporte-qdpu.onrender.com/api/vehiculos/${matricula}`, {
                 params: { matricula: matricula }
             });
             return datos;
@@ -32,7 +32,7 @@ export const useVehiculoStore = defineStore("vehiculo", () => {
 
     const registrarVehiculo = async (info) => {
         try {
-            let datos = await axios.post("http://localhost:4506/api/vehiculos", info)
+            let datos = await axios.post("https://transporte-qdpu.onrender.com/api/vehiculos", info)
             return datos
         } catch (error) {
             console.log(error);
@@ -42,7 +42,7 @@ export const useVehiculoStore = defineStore("vehiculo", () => {
 
     const actualizarVehiculo = async (id, matricula, numero, chofer_id, tipo, marca, modelo, capacidad) => {
         try {
-            let datos = await axios.put(`http://localhost:4506/api/vehiculos/${id}`, {
+            let datos = await axios.put(`https://transporte-qdpu.onrender.com/api/vehiculos/${id}`, {
                 matricula, numero, chofer_id, tipo, marca, modelo, capacidad
             })
             return datos
@@ -54,7 +54,7 @@ export const useVehiculoStore = defineStore("vehiculo", () => {
 
     const actualizarEstado = async (id, estado) => {
         try {
-            let datos = await axios.patch(`http://localhost:4506/api/vehiculos/${id}`,
+            let datos = await axios.patch(`https://transporte-qdpu.onrender.com/api/vehiculos/${id}`,
                 { estado: estado }
             )
             return datos

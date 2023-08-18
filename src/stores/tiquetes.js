@@ -9,7 +9,7 @@ export const useTiqueteStore = defineStore("tiquete", () => {
     const traerTiquete = async (info) => {
         try {
             loading.value = true
-            let datos = await axios.get("http://localhost:4506/api/tiketes", info)
+            let datos = await axios.get("https://transporte-qdpu.onrender.com/api/tiketes", info)
             return datos
         } catch (error) {
             loading.value = true
@@ -20,7 +20,7 @@ export const useTiqueteStore = defineStore("tiquete", () => {
     }
     const traerTiqueteNumero = async (numero) => {
         try {
-            let datos = await axios.get(`http://localhost:4506/api/tiketes/${numero}`, {
+            let datos = await axios.get(`https://transporte-qdpu.onrender.com/api/tiketes/${numero}`, {
                 params: { numero: numero }
             });
             return datos;
@@ -32,7 +32,7 @@ export const useTiqueteStore = defineStore("tiquete", () => {
 
     const postTiquete = async (info) => {
         try {
-            let datos = await axios.post("http://localhost:4506/api/tiketes", info)
+            let datos = await axios.post("https://transporte-qdpu.onrender.com/api/tiketes", info)
             return datos
         } catch (error) {
             return error

@@ -8,7 +8,7 @@ export const useConductorStore = defineStore("chofer", () => {
   const traerConductor = async (info) => {
     try {
       loading.value = true
-      let datos = await axios.get("http://localhost:4506/api/choferes", info);
+      let datos = await axios.get("https://transporte-qdpu.onrender.com/api/choferes", info);
       return datos;
     } catch (error) {
       loading.value = true
@@ -20,7 +20,7 @@ export const useConductorStore = defineStore("chofer", () => {
 
   const traerConductorCedula = async (cedula) => {
     try {
-      let datos = await axios.get(`http://localhost:4506/api/choferes/${cedula}`, {
+      let datos = await axios.get(`https://transporte-qdpu.onrender.com/api/choferes/${cedula}`, {
         params: { cedula: cedula }
       });
       return datos;
@@ -31,7 +31,7 @@ export const useConductorStore = defineStore("chofer", () => {
 
   const registrarConductor = async (info) => {
     try {
-      let datos = await axios.post("http://localhost:4506/api/choferes", info);
+      let datos = await axios.post("https://transporte-qdpu.onrender.com/api/choferes", info);
       return datos;
     } catch (error) {
       throw error
@@ -41,7 +41,7 @@ export const useConductorStore = defineStore("chofer", () => {
   const actualizarConductor = async (id, cedula, nombre, telefono, numero_licencia,
     categoria_licencia, fecha_vencimiento, experiencia) => {
     try {
-      let datos = await axios.put(`http://localhost:4506/api/choferes/${id}`, {
+      let datos = await axios.put(`https://transporte-qdpu.onrender.com/api/choferes/${id}`, {
         cedula, nombre, telefono, numero_licencia,
         categoria_licencia, fecha_vencimiento, experiencia
       });
@@ -53,7 +53,7 @@ export const useConductorStore = defineStore("chofer", () => {
 
   const actualizarEstado = async (id,estado) => {
     try{
-      let datos = await axios.patch(`http://localhost:4506/api/choferes/${id}`,
+      let datos = await axios.patch(`https://transporte-qdpu.onrender.com/api/choferes/${id}`,
       {estado:estado}
       )
       return datos

@@ -8,7 +8,7 @@ export const useRutaStore = defineStore("ruta", () => {
     const traerRuta = async (info) => {
         try {
             loading.value = true
-            let datos = await axios.get("http://localhost:4506/api/rutas", info)
+            let datos = await axios.get("https://transporte-qdpu.onrender.com/api/rutas", info)
             return datos
         } catch (error) {
             loading.value = true
@@ -20,7 +20,7 @@ export const useRutaStore = defineStore("ruta", () => {
 
     const traerRutaNombre = async (nombre) => {
         try {
-            let datos = await axios.get(`http://localhost:4506/api/rutas/${nombre}`, {
+            let datos = await axios.get(`https://transporte-qdpu.onrender.com/api/rutas/${nombre}`, {
                 params: { nombre: nombre }
             });
             return datos;
@@ -32,7 +32,7 @@ export const useRutaStore = defineStore("ruta", () => {
 
     const registrarRuta = async (info) => {
         try {
-            let datos = await axios.post("http://localhost:4506/api/rutas", info)
+            let datos = await axios.post("https://transporte-qdpu.onrender.com/api/rutas", info)
             return datos
         } catch (error) {
             console.log(error);
@@ -42,7 +42,7 @@ export const useRutaStore = defineStore("ruta", () => {
 
     const actualizarRuta = async (id, codigoRuta, nombre, origen, destino, valor,hora_salida) => {
         try {
-            let datos = await axios.put(`http://localhost:4506/api/rutas/${id}`, {
+            let datos = await axios.put(`https://transporte-qdpu.onrender.com/api/rutas/${id}`, {
                 codigoRuta, nombre, origen, destino, valor,hora_salida
             })
             return datos
@@ -54,7 +54,7 @@ export const useRutaStore = defineStore("ruta", () => {
 
     const actualizarEstado = async (id, estado) => {
         try {
-            let datos = await axios.patch(`http://localhost:4506/api/rutas/${id}`,
+            let datos = await axios.patch(`https://transporte-qdpu.onrender.com/api/rutas/${id}`,
                 { estado: estado }
             )
             return datos

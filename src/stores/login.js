@@ -8,7 +8,7 @@ export const useLoginStore = defineStore("login", () => {
   const logi = async (username, clave) => {
     try {
       loading.value = true
-      let datos = await axios.post("http://localhost:4506/api/logins/login",
+      let datos = await axios.post("https://transporte-qdpu.onrender.com/api/logins/login",
         { username: username, clave: clave });
       return datos;
     } catch (error) {

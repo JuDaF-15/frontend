@@ -8,7 +8,7 @@ export const useClienteStore = defineStore("cliente", () => {
     const traerCliente = async (info) => {
         try {
             loading.value = true
-            let datos = await axios.get("http://localhost:4506/api/pasajeros", info)
+            let datos = await axios.get("https://transporte-qdpu.onrender.com/api/pasajeros", info)
             return datos
         } catch (error) {
             loading.value = true
@@ -19,7 +19,7 @@ export const useClienteStore = defineStore("cliente", () => {
     }
     const traerPasajeroCedula = async (cedula) => {
         try {
-            let datos = await axios.get(`http://localhost:4506/api/pasajeros/${cedula}`, {
+            let datos = await axios.get(`https://transporte-qdpu.onrender.com/api/pasajeros/${cedula}`, {
                 params: { cedula: cedula }
             });
             return datos;
@@ -31,7 +31,7 @@ export const useClienteStore = defineStore("cliente", () => {
 
     const registrarCliente = async (info) => {
         try {
-            let datos = await axios.post("http://localhost:4506/api/pasajeros", info)
+            let datos = await axios.post("https://transporte-qdpu.onrender.com/api/pasajeros", info)
             return datos
         } catch (error) {
             console.log(error);
@@ -41,7 +41,7 @@ export const useClienteStore = defineStore("cliente", () => {
 
     const actualizarCliente = async (id, cedula, nombre, telefono) => {
         try {
-            let datos = await axios.put(`http://localhost:4506/api/pasajeros/${id}`, {
+            let datos = await axios.put(`https://transporte-qdpu.onrender.com/api/pasajeros/${id}`, {
                 cedula, nombre, telefono
             });
             return datos;
@@ -53,7 +53,7 @@ export const useClienteStore = defineStore("cliente", () => {
 
     const actualizarEstado = async (id, estado) => {
         try {
-            let datos = await axios.patch(`http://localhost:4506/api/pasajeros/${id}`,
+            let datos = await axios.patch(`https://transporte-qdpu.onrender.com/api/pasajeros/${id}`,
                 { estado: estado }
             )
             return datos
