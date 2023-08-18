@@ -123,8 +123,8 @@ let selectedVehiculo = ref("");
 
 let alert = ref(false);
 let paraAgregar = ref(false)
-let ruta = ref("");
-let vehiculo = ref("");
+let ruta = ref([]);
+let vehiculo = ref([]);
 let puesto = ref();
 let fechaSalida = ref(new Date().toISOString().substr(0, 10));
 let ok = ref(false)
