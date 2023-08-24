@@ -55,12 +55,22 @@ function validar() {
 async function iniciarSesion() {
   useLogin.logi(username.value, clave.value)
     .then((res) => {
-      const token = res.data.token;
-      sessionStorage.setItem('token', token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      ruta.value = "/homeAdmin";
-      router.push(ruta.value);
-      console.log(token);
+      if (res.data.empleado.estado == 0) {
+        $q.notify({
+          message: "El empleado está inactivo",
+          color: 'red',
+          icon: 'warning',
+          position: 'top',
+          timeout: Math.random() * 3000
+        })
+      } else {
+        const token = res.data.token;
+        sessionStorage.setItem('token', token);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        ruta.value = "/homeAdmin";
+        router.push(ruta.value);
+        console.log(token);
+      }
     }).catch((error) => {
       if (error.response && error.response.data.errors && validar() === true) {
 
